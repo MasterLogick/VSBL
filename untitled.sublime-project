@@ -1,0 +1,26 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems":
+    [
+        {
+            "name": "YASM",
+            "working_dir": "$project_path",
+	        "cmd": ["./br.sh"],
+	        "variants":[
+	        	{
+	        		"name":"Build",
+	        		"cmd":["./build.sh"]
+	        	},
+	        	{
+	        		"name":"Run",
+	        		"cmd":["./run.sh"]
+	        	}
+	        ]
+        }
+    ]
+}
