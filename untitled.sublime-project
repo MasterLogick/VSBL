@@ -19,6 +19,9 @@
 	        	{
 	        		"name":"Run",
 	        		"cmd":["./run.sh"]
+	        	},{
+	        		"name": "Test",
+	        		"cmd":["./test.sh"]
 	        	}
 	        ]
         }
