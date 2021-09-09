@@ -10,18 +10,19 @@
         {
             "name": "YASM",
             "working_dir": "$project_path",
-	        "cmd": ["./br.sh"],
+	        "cmd": ["./bcr.sh"],
 	        "variants":[
 	        	{
 	        		"name":"Build",
 	        		"cmd":["./build.sh"]
 	        	},
 	        	{
+	        		"name":"Convert",
+	        		"cmd":["./convert.sh"]
+	        	},
+	        	{
 	        		"name":"Run",
 	        		"cmd":["./run.sh"]
-	        	},{
-	        		"name": "Test",
-	        		"cmd":["./test.sh"]
 	        	}
 	        ]
         }

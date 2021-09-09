@@ -1,2 +1,3 @@
 #!/bin/bash
-vboxmanage startvm Test_VM_64
+MACHINE_NAME="Test_VM"
+vboxmanage startvm $MACHINE_NAME
