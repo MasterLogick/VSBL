@@ -1,27 +1,30 @@
 ENTRY(_kernel_entry_asm)
 SECTIONS{
 	. = 0x7c00;
-	.bootsection BLOCK(512) : ALIGN(512) {
-	    *(.bootsection)
+	.primary_bootsection BLOCK(512) : ALIGN(512) {
+	    *(.primary_bootsection)
 	}
-	.text BLOCK(512) : ALIGN(512) {
+	.secondary_bootsection : {
+	    *(.secondary_bootsection)
+	}
+	.text : {
 	    *(.text)
 	}
-	.rodata BLOCK(512) : ALIGN(512) {
+	.rodata : {
 		*(.rodata)
 	}
  
 	/* Read-write data (initialized) */
-	.data BLOCK(512) : ALIGN(512) {
+	.data : {
 		*(.data)
 	}
  
 	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(512) : ALIGN(512) {
+	.bss : {
 		*(COMMON)
 		*(.bss)
 		*(.stack)
 		stack_top = .;
 	}
-	kernel_sectors_count = (SIZEOF(.bootsection) + SIZEOF(.text) + SIZEOF(.rodata) + SIZEOF(.data) + SIZEOF(.bss) + 512 - 1) / 512 - 1;
+	kernel_sectors_count = (SIZEOF(.secondary_bootsection) + SIZEOF(.text) + SIZEOF(.rodata) + SIZEOF(.data) + SIZEOF(.bss) + 512 - 1) / 512 - 1;
 }

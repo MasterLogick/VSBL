@@ -1,7 +1,8 @@
 #!/bin/bash
 yasm -f elf32 src/boot.asm -o out/boot.o
-cc -c src/kernel.c -o out/kernel.o -m32 --freestanding -fstrength-reduce -fomit-frame-pointer -finline-functions -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -Wall -Werror -Iinc -O2
-ld -T linker.ld -o out/boot.elf -O2 -nostdlib -m elf_i386 out/boot.o out/kernel.o
+yasm -f elf32 src/secondary.asm -o out/secondary.o
+cc -c src/kernel.c -o out/kernel.o -m32 --freestanding -fno-pic -Wall -Wextra -Werror -O2
+ld -T linker.ld -o out/boot.elf -O2 -nostdlib -m elf_i386 out/boot.o out/secondary.o out/kernel.o
 objcopy -O binary out/boot.elf out/boot.img
 #padd boot.img to x512 bytes size
 REAL_SIZE=$(stat -c%s out/boot.img)

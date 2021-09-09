@@ -1,21 +1,22 @@
 BITS 16
 
 extern kernel_sectors_count
-extern stack_top
-extern kmain
+extern _protected_mode_entry_asm
 
-; section .stack
-; align 16
-; resb 16*1024 ; 16 KiB
+section .stack
+align 16
+resb 16*1024 ; 16 KiB
 
-section .bootsection
+section .primary_bootsection
 global _kernel_entry_asm
 
 _kernel_entry_asm:
+    ;load temporary stack pointer
     cli
-    mov esp, stack_top
+    mov esp, 0x7bff
     sti
 
+    ;enable A20 memory bus
     in al, 0x92
     or al, 2
     out 0x92, al
@@ -32,26 +33,57 @@ _kernel_entry_asm:
     mov word [ds:di], bx
     mov word cx, [es:si]
     cmp cx, bx
-    mov al, 'c'
     jne .c1
-    mov al, 'e'
-.c1:
-    call error_print
+    mov al, 'A'
+    jmp .err
 
-    ;Extended read
-    mov ax, 0
+.c1:
+    ;find drive with our kernel  
+    ;first hdd number is 0x80
+    mov dl, 0x7f
+    mov cl, [0x0475]
+    cmp cl, 0
+    mov al, '0'
+    jz .err
+.l:
+    inc dl
+    xor ax, ax
+    mov ds, ax
+    mov ah, 0x42
+    mov si, test_data_packet
+    int 0x13
+    mov al, 'r'
+    jc .err
+    mov eax, [signature]
+    mov ebx, [0x7c00 + 0x200 - 6]
+    cmp eax, ebx
+    je .br 
+    loop .l
+    ;load kernel from hard drive
+.br:
+    xor ax, ax
     mov ds, ax
     mov ah, 0x42
     mov dl, drive_number
     mov si, data_packet
     int 0x13
-    mov al, 'e'
+    mov al, 'l'
     jc .err
-    mov al, 'c'
-    call error_print
-    call kmain
+
+    ;setup GDT
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    cli
+    lgdt [GDT_DESCRIPTION]
+
+    ;transfer to protected mode
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
+    jmp 0x08:_protected_mode_entry_asm
 .err:
-    call error_print
+    call _error_print_asm
     cli
 .h:  
     hlt
@@ -59,38 +91,23 @@ _kernel_entry_asm:
 .end:
 size _kernel_entry_asm _kernel_entry_asm.end - _kernel_entry_asm
 
-;bx = value to print
-global dbg_print
-dbg_print:
-    push ax
-    push bx
-    push cx
-    mov cx, 16
-.l_1:
-    shl bx, 1
-    mov al, '0'
-    jnc .c_2
-    mov al, '1'
-.c_2:
-    call error_print
-    loop .l_1
-    pop cx
-    pop bx
-    pop ax
-    ret
-.end:
-size dbg_print dbg_print.end - dbg_print
-
 ;al = ascii code to print
-global error_print
-error_print:
+global _error_print_asm
+_error_print_asm:
     push ax
     mov ah, 0x0e
     int 0x10
     pop ax
     ret
 .end:
-size error_print error_print.end - error_print
+size _error_print_asm _error_print_asm.end - _error_print_asm
+
+test_data_packet:
+    db 0x10 ; packet size
+    db 0    ; reserved (0)
+    dw 1  ; blocks to read
+    dd transfer_buffer_ptr
+    dq 0x0
 
 data_packet:
     db 0x10 ; packet size
@@ -99,7 +116,51 @@ data_packet:
     dd transfer_buffer_ptr
     dq 0x1
 drive_number equ 0x80
-times 512 - 2 - ($ - $$) db 0
+
+align 4
+GDT_DESCRIPTION:
+dw GDT.end - GDT - 1
+dd GDT
+dd 0
+
+align 8
+GDT:
+
+.gdte_zero:
+dq 0
+
+.gdte_code:
+; limit 0-15 bits
+dw 0xffff
+; base 0-15 bits
+dw 0x0
+; base 16-23 bits
+db 0x0
+; access byte
+db 10011010b
+; flags, limit 16-19 bits
+db 11001111b
+; base 24-31 bits
+db 0x0
+
+.gdte_data:
+; limit 0-15 bits
+dw 0xffff
+; base 0-15 bits
+dw 0x0
+; base 16-23 bits
+db 0x0
+; access byte
+db 10010010b
+; flags, limit 16-19 bits
+db 11001111b
+; base 24-31 bits
+db 0x0
+
+.end:
+
+times 512 - 6 - ($ - $$) db 0
+signature: db "SIGN"
 db 0x55
 db 0xaa
 transfer_buffer_ptr:
