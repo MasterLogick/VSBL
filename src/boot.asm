@@ -160,7 +160,7 @@ db 0x0
 .end:
 
 times 512 - 6 - ($ - $$) db 0
-signature: db "SIGN"
+signature: db "VSBL"
 db 0x55
 db 0xaa
 transfer_buffer_ptr:
