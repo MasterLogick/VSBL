@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
- 
+
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,
@@ -20,7 +20,7 @@ enum vga_color {
 	VGA_COLOR_LIGHT_BROWN = 14,
 	VGA_COLOR_WHITE = 15,
 };
- 
+
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
 	return fg | bg << 4;
 }
@@ -57,10 +57,6 @@ void terminal_initialize(void) {
 	}
 }
  
-void terminal_setcolor(uint8_t color) {
-	terminal_color = color;
-}
- 
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
@@ -86,5 +82,5 @@ void terminal_writestring(const char* data) {
  
 void kmain(void) {
 	terminal_initialize();
-	terminal_writestring("Hello from kernel World! Use this power wisely! lol kek");
+    terminal_writestring("Hello from kernel World! Use this power wisely! lol kek");
 }

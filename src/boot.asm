@@ -1,3 +1,11 @@
+;VSBL - Very Simple Boot Loader
+
+;Primary bootloader errors:
+;A - A20 line is still disabled after attempt of loading
+;N - no hdd drives found
+;D - the first hard drive sector read error
+;K - secondary bootloader code read error
+
 BITS 16
 
 extern kernel_sectors_count
@@ -43,7 +51,7 @@ _kernel_entry_asm:
     mov dl, 0x7f
     mov cl, [0x0475]
     cmp cl, 0
-    mov al, '0'
+    mov al, 'N'
     jz .err
 .l:
     inc dl
@@ -52,7 +60,7 @@ _kernel_entry_asm:
     mov ah, 0x42
     mov si, test_data_packet
     int 0x13
-    mov al, 'r'
+    mov al, 'D'
     jc .err
     mov eax, [signature]
     mov ebx, [0x7c00 + 0x200 - 6]
@@ -67,7 +75,7 @@ _kernel_entry_asm:
     mov dl, drive_number
     mov si, data_packet
     int 0x13
-    mov al, 'l'
+    mov al, 'K'
     jc .err
 
     ;setup GDT
@@ -100,6 +108,30 @@ _error_print_asm:
     pop ax
     ret
 .end:
+
+;al = byte to print in binary format
+global _binary_print_asm
+_binary_print_asm:
+    push ax
+    push bx
+    push cx
+    mov ah, 0x0e
+    mov cx, 8
+    mov bl, al
+.l1:
+    shl bl, 1
+    mov al, '0'
+    jnc .else
+    inc al
+.else:
+    int 0x10
+    loop .l1
+    pop cx
+    pop bx
+    pop ax
+    ret
+.end:
+size _binary_print_asm _binary_print_asm.end - _binary_print_asm
 size _error_print_asm _error_print_asm.end - _error_print_asm
 
 test_data_packet:

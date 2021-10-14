@@ -8,21 +8,21 @@
 	"build_systems":
     [
         {
-            "name": "YASM",
+            "name": "Makefile",
             "working_dir": "$project_path",
-	        "cmd": ["./bcr.sh"],
+	        "cmd": ["make"],
 	        "variants":[
 	        	{
-	        		"name":"Build",
-	        		"cmd":["./build.sh"]
-	        	},
-	        	{
 	        		"name":"Convert",
-	        		"cmd":["./convert.sh"]
+	        		"cmd":["make", "convert"]
 	        	},
 	        	{
-	        		"name":"Run",
-	        		"cmd":["./run.sh"]
+	        		"name":"Run VM",
+	        		"cmd":["make", "run_vm"]
+	        	},
+	        	{
+	        		"name":"Clean",
+	        		"cmd":["make", "clean"]
 	        	}
 	        ]
         }
