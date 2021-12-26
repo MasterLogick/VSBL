@@ -30,6 +30,7 @@ _get_cpuid_leaf_asm:
     jmp .r
 .not_ecx:
     cmp byte [esp+0x8], CPUID_EDX_ASM
+    mov eax, edx
     jne .r
 .r:
     ret
