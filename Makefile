@@ -31,8 +31,8 @@ $(BUILD_DIR)/%.asm.o: $(SRC_DIR)/%.asm
 	mkdir -p $(dir $@)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
-prepare_dirs: $(BUILD_DIRS)
-	mkdir -p $?
+prepare_dirs:
+	mkdir -p $(BUILD_DIRS)
 
 extract_image: prepare_dirs link
 	objcopy -O binary $(BUILD_DIR)/$(ELF_IMAGE) $(BUILD_DIR)/$(BINARY_IMAGE).old
@@ -51,5 +51,5 @@ convert: extract_image
 	vboxmanage convertfromraw $$(pwd)/$(BUILD_DIR)/$(BINARY_IMAGE) $$(pwd)/$(MACHINE_NAME)/$(MACHINE_NAME).vdi --format VDI
 	vboxmanage storageattach $(MACHINE_NAME) --storagectl SATA --port 1 --type hdd --medium $$(pwd)/$(MACHINE_NAME)/$(MACHINE_NAME).vdi
 
-run_vm: extract_image
+run_vm: convert
 	vboxmanage startvm $(MACHINE_NAME)

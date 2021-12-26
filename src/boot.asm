@@ -21,7 +21,7 @@ global _kernel_entry_asm
 _kernel_entry_asm:
     ;load temporary stack pointer
     cli
-    mov esp, 0x7bff
+    mov esp, 0x7bf0
     sti
 
     ;enable A20 memory bus
@@ -90,6 +90,7 @@ _kernel_entry_asm:
     or eax, 1
     mov cr0, eax
     jmp 0x08:_protected_mode_entry_asm
+    jmp .h
 .err:
     call _error_print_asm
     cli
@@ -108,6 +109,7 @@ _error_print_asm:
     pop ax
     ret
 .end:
+size _error_print_asm _error_print_asm.end - _error_print_asm
 
 ;al = byte to print in binary format
 global _binary_print_asm
@@ -121,9 +123,9 @@ _binary_print_asm:
 .l1:
     shl bl, 1
     mov al, '0'
-    jnc .else
+    jnc .zero
     inc al
-.else:
+.zero:
     int 0x10
     loop .l1
     pop cx
@@ -132,7 +134,6 @@ _binary_print_asm:
     ret
 .end:
 size _binary_print_asm _binary_print_asm.end - _binary_print_asm
-size _error_print_asm _error_print_asm.end - _error_print_asm
 
 test_data_packet:
     db 0x10 ; packet size
