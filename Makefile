@@ -35,12 +35,7 @@ prepare_dirs:
 	mkdir -p $(BUILD_DIRS)
 
 extract_image: prepare_dirs link
-	objcopy -O binary $(BUILD_DIR)/$(ELF_IMAGE) $(BUILD_DIR)/$(BINARY_IMAGE).old
-	export REAL_SIZE=$$(stat -c%s $(BUILD_DIR)/$(BINARY_IMAGE).old);\
-	export BLOCK_COUNT=$$((($$REAL_SIZE+$(KERNEL_PADDING)-1)/$(KERNEL_PADDING)));\
-	export BLOCK_COUNT=$$(($$BLOCK_COUNT>$$(($(KERNEL_MIN_BLOCK_COUNT))) ? $$BLOCK_COUNT : $$(($(KERNEL_MIN_BLOCK_COUNT)))/$(KERNEL_PADDING)));\
-	dd if=/dev/zero of=$(BUILD_DIR)/$(BINARY_IMAGE) bs=$(KERNEL_PADDING) count=$$BLOCK_COUNT;\
-    dd if=$(BUILD_DIR)/$(BINARY_IMAGE).old of=$(BUILD_DIR)/$(BINARY_IMAGE) bs=1 count=$$REAL_SIZE seek=0 conv=notrunc;
+	./extract_image.sh $(BUILD_DIR) $(ELF_IMAGE) $(BINARY_IMAGE) $(KERNEL_PADDING) $(KERNEL_MIN_BLOCK_COUNT)
 
 clean:
 	rm -r out/*
