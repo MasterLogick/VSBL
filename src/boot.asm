@@ -22,7 +22,6 @@ _kernel_entry_asm:
     ;load temporary stack pointer
     cli
     mov esp, 0x7bf0
-    sti
 
     ;enable A20 memory bus
     in al, 0x92
@@ -63,7 +62,7 @@ _kernel_entry_asm:
     mov al, 'D'
     jc .err
     mov eax, [signature]
-    mov ebx, [0x7c00 + 0x200 - 6]
+    mov ebx, [signature + 0x200]
     cmp eax, ebx
     je .br 
     loop .l
@@ -82,7 +81,6 @@ _kernel_entry_asm:
     xor ax, ax
     mov ds, ax
     mov es, ax
-    cli
     lgdt [GDT_DESCRIPTION]
 
     ;transfer to protected mode
@@ -90,12 +88,10 @@ _kernel_entry_asm:
     or eax, 1
     mov cr0, eax
     jmp 0x08:_protected_mode_entry_asm
-    jmp .h
+
 .err:
     call _error_print_asm
-    cli
 .h:  
-    hlt
     jmp .h
 .end:
 size _kernel_entry_asm _kernel_entry_asm.end - _kernel_entry_asm
@@ -192,7 +188,7 @@ db 0x0
 
 .end:
 
-times 512 - 6 - ($ - $$) db 0
+times 0x200 - 6 - ($ - $$) db 0
 signature: db "VSBL"
 db 0x55
 db 0xaa

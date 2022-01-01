@@ -13,7 +13,6 @@ _protected_mode_entry_asm:
     mov fs, ax
     mov gs, ax
     mov esp, stack_top
-    cli
     call kmain
     jmp $
 .end:
