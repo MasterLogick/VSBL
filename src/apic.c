@@ -9,6 +9,8 @@
 #define APIC_SPURIOUS_INTERRUPT_VECTOR_REGISTER 0xf0
 #define APIC_DIVIDE_CONFIGURATION_REGISTER 0x3e0
 #define APIC_INITIAL_COUNT_REGISTER 0x380
+#define APIC_ID_REGISTER 0x20
+#define APIC_EOI_REGISTER 0xb0
 
 apic_base apic_get_base() {
     return (apic_base) (uintptr_t) (_msr_get_asm(IA32_APIC_BASE_MSR) & 0xfffff000);
@@ -24,6 +26,14 @@ bool apic_is_bsp(void) {
 
 uint32_t apic_get_version_register(apic_base base) {
     return *((uint32_t *) (base + APIC_VERSION_REGISTER));
+}
+
+uint8_t apic_get_id(apic_base base) {
+    return *((uint32_t *) (base + APIC_ID_REGISTER)) >> 24;
+}
+
+void apic_eoi(apic_base base) {
+    *((uint32_t *) (base + APIC_EOI_REGISTER)) = 0;
 }
 
 void apic_init_lvt(apic_base base) {

@@ -38,6 +38,15 @@ void memset(void *dst, char ch, size_t size) {
     }
 }
 
+bool memcmp(void *ptr1, void *ptr2, size_t size) {
+    char *ptr_chr1 = ptr1;
+    char *ptr_chr2 = ptr2;
+    while (size--) {
+        if (*ptr_chr1++ != *ptr_chr2++)return false;
+    }
+    return true;
+}
+
 size_t strlen(char *str) {
     size_t len = 0;
     while (str[len])

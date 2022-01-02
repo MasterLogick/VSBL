@@ -44,7 +44,8 @@ void (*idt_handlers[IDT_DESCRIPTORS_COUNT])(void) = {
         //------------VSBL Interrupts---------// | 32-255 |   —      | User Defined (Non-reserved) Interrupts     | Interrupt  | —          | External interrupt or INT n instruction.
         _idt_int_apic_timer_handler_asm,      // |   32   |   #TM    | APIC timer interrupt                       |            |            |
         NULL,                                 // |   33   |   #SP    | APIC spurious interrupt                    |            |            |
-        _idt_int_apic_error_handler_asm       // |   34   |   #ER    | APIC error interrupt                       |            |            |
+        _idt_int_apic_error_handler_asm,      // |   34   |   #ER    | APIC error interrupt                       |            |            |
+        _idt_int_keyboard_handler_asm         // |   35   |   #KB    | Keyboard interrupt                         |            |            |
 
 };
 

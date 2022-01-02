@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define IDT_DESCRIPTORS_COUNT 35
+#define IDT_DESCRIPTORS_COUNT 36
 
 struct idt_descriptor {
     uint16_t entry[4];
@@ -27,5 +27,7 @@ void _idt_int_DF_handler_asm(void);
 void _idt_int_apic_timer_handler_asm(void);
 
 void _idt_int_apic_error_handler_asm(void);
+
+void _idt_int_keyboard_handler_asm(void);
 
 #endif //IDT_C

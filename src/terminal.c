@@ -87,57 +87,132 @@ void terminal_writestring(char *data) {
     terminal_write(data, strlen(data));
 }
 
-void terminal_print_int(uint32_t val) {
-    char str[10];
-    for (int i = 9; i >= 0; --i) {
-        str[i] = '0' + val % 10;
-        val /= 10;
-    }
-    terminal_write(str, 10);
-}
+#define INT8_STRING_MAX_LEN 8
 
-void terminal_print_int_hex(uint32_t val) {
-    char str[8];
-    for (int i = 7; i >= 0; --i) {
-        str[i] = val & 0xf;
+void terminal_print_int8(uint8_t val, int radix, bool full) {
+    char str[INT8_STRING_MAX_LEN];
+    for (int i = INT8_STRING_MAX_LEN - 1; i >= 0; --i) {
+        str[i] = val % radix;
         if (str[i] >= 0xa) {
             str[i] += 'a' - 0xa;
         } else {
             str[i] += '0';
         }
-        val >>= 4;
+        val /= radix;
+        if (!full && val == 0) {
+            terminal_write(&str[i], INT8_STRING_MAX_LEN - i);
+            return;
+        }
     }
-    terminal_write(str, 8);
+    switch (radix) {
+        case 8:
+            terminal_write(&str[INT8_STRING_MAX_LEN - 11], 11);
+            break;
+        case 10:
+            terminal_write(&str[INT8_STRING_MAX_LEN - 10], 10);
+            break;
+        case 16:
+            terminal_write(&str[INT8_STRING_MAX_LEN - 8], 8);
+            break;
+        default:
+            terminal_write(str, INT8_STRING_MAX_LEN);
+    }
+}
+
+#define INT32_STRING_MAX_LEN 32
+
+void terminal_print_int32(uint32_t val, int radix, bool full) {
+    char str[INT32_STRING_MAX_LEN];
+    for (int i = INT32_STRING_MAX_LEN - 1; i >= 0; --i) {
+        str[i] = val % radix;
+        if (str[i] >= 0xa) {
+            str[i] += 'a' - 0xa;
+        } else {
+            str[i] += '0';
+        }
+        val /= radix;
+        if (!full && val == 0) {
+            terminal_write(&str[i], INT32_STRING_MAX_LEN - i);
+            return;
+        }
+    }
+    switch (radix) {
+        case 8:
+            terminal_write(&str[INT32_STRING_MAX_LEN - 11], 11);
+            break;
+        case 10:
+            terminal_write(&str[INT32_STRING_MAX_LEN - 10], 10);
+            break;
+        case 16:
+            terminal_write(&str[INT32_STRING_MAX_LEN - 8], 8);
+            break;
+        default:
+            terminal_write(str, INT32_STRING_MAX_LEN);
+    }
 }
 
 void terminal_printf(char *format, ...) {
     pr_list list;
     _pr_start_asm(&list, &format);
     int arg = 0;
+    int len = 0;
+    bool full = false;
     while (*format) {
         if (*format == '%') {
             format++;
             uint32_t pr_arg = _pr_arg_asm(list, arg);
             arg++;
+            if (*format == '[') {
+                format++;
+                while (*format != ']') {
+                    len = len * 10 + *format - '0';
+                    format++;
+                }
+                format++;
+            }
+            if (*format == '!') {
+                full = true;
+                format++;
+            }
             switch (*format) {
                 case 'c':
                     terminal_putchar((char) pr_arg);
                     break;
                 case 'd':
                 case 'i':
-                    terminal_print_int(pr_arg);
+                    if (len == 0) {
+                        terminal_print_int32(pr_arg, 10, full);
+                    } else {
+                        uint8_t *ptr = (uint8_t *) pr_arg;
+                        for (int i = len - 1; i >= 0; --i) {
+                            terminal_print_int8(ptr[i], 10, full);
+                        }
+                    }
                     break;
                 case 's':
-                    terminal_writestring((char *) pr_arg);
+                    if (len == 0) {
+                        terminal_writestring((char *) pr_arg);
+                    } else {
+                        terminal_write((char *) pr_arg, len);
+                    }
                     break;
                 case 'x':
-                    terminal_print_int_hex(pr_arg);
+                    if (len == 0) {
+                        terminal_print_int32(pr_arg, 16, full);
+                    } else {
+                        uint8_t *ptr = (uint8_t *) pr_arg;
+                        for (int i = len - 1; i >= 0; --i) {
+                            terminal_print_int8(ptr[i], 16, full);
+                        }
+                    }
                     break;
                 case '%':
                     terminal_putchar('%');
                     arg--;
                     break;
             }
+            len = 0;
+            full = false;
         } else {
             terminal_putchar(*format);
         }

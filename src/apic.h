@@ -26,6 +26,10 @@ bool apic_is_bsp(void);
 
 uint32_t apic_get_version_register(apic_base base);
 
+uint8_t apic_get_id(apic_base base);
+
+void apic_eoi(apic_base base);
+
 void apic_init_lvt(apic_base base);
 
 void apic_set_timer_divider(apic_base base, timer_divider divider);
