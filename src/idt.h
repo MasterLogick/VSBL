@@ -16,6 +16,8 @@ void _idt_load_table_asm(uint16_t size, void *idt_ptr);
 
 void _idt_enable_hardware_interrupts_asm(void);
 
+void _idt_disable_hardware_interrupts_asm(void);
+
 void _idt_int_3_handler_asm(void);
 
 void _idt_int_fallback_handler_asm(void);

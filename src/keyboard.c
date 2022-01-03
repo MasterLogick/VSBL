@@ -1,5 +1,6 @@
 #include "keyboard.h"
 #include <stdbool.h>
+#include "ps2.h"
 
 #define KEY_COUNT 0x100
 
@@ -361,7 +362,8 @@ keyboard_event_handler local_handler;
 
 bool global_keyboard_second_block_event = false;
 
-void keyboard_global_handle_event(uint8_t scancode) {
+void keyboard_global_handle_event() {
+    uint8_t scancode = ps2_read_response();
     if (scancode == K_SECOND_PART_SCANCODE) {
         global_keyboard_second_block_event = true;
         if (local_handler)local_handler(scancode, '\0', K_SECOND_PART_SCANCODE);

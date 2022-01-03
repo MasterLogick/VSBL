@@ -55,6 +55,14 @@ _idt_enable_hardware_interrupts_asm:
 .end:
 size _idt_enable_hardware_interrupts_asm _idt_enable_hardware_interrupts_asm.end - _idt_enable_hardware_interrupts_asm
 
+; void _idt_disable_hardware_interrupts_asm(void)
+global _idt_disable_hardware_interrupts_asm
+_idt_disable_hardware_interrupts_asm:
+    cli
+    ret
+.end:
+size _idt_disable_hardware_interrupts_asm _idt_disable_hardware_interrupts_asm.end - _idt_disable_hardware_interrupts_asm
+
 ; void _idt_int_test_handler_asm(void)
 global _idt_int_test_handler_asm
 _idt_int_test_handler_asm:
@@ -117,16 +125,9 @@ size _idt_int_apic_error_handler_asm _idt_int_apic_error_handler_asm.end - _idt_
 global _idt_int_keyboard_handler_asm
 _idt_int_keyboard_handler_asm:
     pushad
-    xor eax, eax
-    in eax, 0x60
-    push eax
-;    push eax
     call keyboard_global_handle_event
-;    mov eax, aIntKB
-;    mov [esp], eax
-;    call terminal_printf
     call apic_get_base
-    mov [esp], eax
+    push eax
     call apic_eoi
     add esp, 4
     popad
@@ -136,10 +137,11 @@ size _idt_int_keyboard_handler_asm _idt_int_keyboard_handler_asm.end - _idt_int_
 
 section .data
 
-aIntFallbackMsg db "Interrupt at address: %x. Freezing...", 0x0a, 0
+aIntFallbackMsg db "Fallback interrupt handler reached. Freezing...", 0x0a, "   EDI=0x%!x", 0x0a, "   ESI=0x%!x", 0x0a,\
+    "   EBP=0x%!x", 0x0a, "   ESP=0x%!x", 0x0a, "   EBX=0x%!x", 0x0a, "   EDX=0x%!x", 0x0a, "   ECX=0x%!x", 0x0a,\
+    "   EAX=0x%!x", 0x0a, "   EIP=0x%!x", 0x0a, "    CS=0x%!x", 0x0a, "EFLAGS=0x%!x", 0x0a, 0
 aInt3Msg db "Breakpoint at address: %x", 0x0a, 0
 aIntTestMsg db "Test msg EIP=%!x CS=%!x EFLAGS=%!x", 0x0a, 0
 aIntDFMsg db "Abort #DF at EIP=%!x CS=%!x EFLAGS=%!x", 0x0a, 0
 aIntTimerMsg db "Timer reached zero", 0x0a, 0
 aIntAPICErrorMsg db "APIC errors: %x", 0x0a, 0
-aIntKB db "%x", 0x0a, 0
