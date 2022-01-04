@@ -6,7 +6,7 @@
 
 typedef uint8_t *io_apic_base;
 
-io_apic_base global_io_apic_base;
+extern io_apic_base global_io_apic_base;
 
 #define IO_APIC_ID 0x0
 #define IO_APIC_VERSION 0x1

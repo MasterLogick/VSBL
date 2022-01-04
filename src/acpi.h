@@ -145,12 +145,9 @@ typedef struct fadt fadt;
 
 bool acpi_parse_tables(void);
 
-rsdp *acpi_get_rsdp(void);
-
-rsdt *acpi_get_rsdt(void);
-
-fadt *acpi_get_fadt(void);
-
-madt *acpi_get_madt(void);
+extern rsdp *acpi_global_rsdp;
+extern rsdt *acpi_global_rsdt;
+extern fadt *acpi_global_fadt;
+extern madt *acpi_global_madt;
 
 #endif //ACPI_H

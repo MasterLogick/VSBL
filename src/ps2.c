@@ -21,7 +21,7 @@ void ps2_exec_command(uint8_t command) {
 }
 
 bool ps2_init(void) {
-    if (!(acpi_get_fadt()->IAPC_BOOT_ARCH & 0x2)) {
+    if (!(acpi_global_fadt->IAPC_BOOT_ARCH & 0x2)) {
         terminal_printf("PS/2: this PC doesn't have PS/2 controller\n");
         return false;
     }

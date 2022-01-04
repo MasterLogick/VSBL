@@ -2,33 +2,17 @@
 #include "string.h"
 #include "terminal.h"
 
-rsdp *global_rsdp;
-rsdt *global_rsdt;
-fadt *global_fadt;
-madt *global_madt;
-
-rsdp *acpi_get_rsdp(void) {
-    return global_rsdp;
-}
-
-rsdt *acpi_get_rsdt(void) {
-    return global_rsdt;
-}
-
-fadt *acpi_get_fadt(void) {
-    return global_fadt;
-}
-
-madt *acpi_get_madt(void) {
-    return global_madt;
-}
+rsdp *acpi_global_rsdp;
+rsdt *acpi_global_rsdt;
+fadt *acpi_global_fadt;
+madt *acpi_global_madt;
 
 int acpi_get_tables_count(rsdt *ptr) {
     return (ptr->header.length - sizeof(acpi_description_header)) / sizeof(acpi_description_header *);
 }
 
 bool acpi_parse_fadt(fadt *ptr) {
-    global_fadt = ptr;
+    acpi_global_fadt = ptr;
     return true;
 }
 
@@ -52,7 +36,7 @@ bool acpi_validate_table_header(acpi_description_header *header) {
 }
 
 bool acpi_parse_madt(madt *ptr) {
-    global_madt = ptr;
+    acpi_global_madt = ptr;
     ics_header *ics = &ptr->ics[0];
     for (int j = 0; (uint32_t) ((char *) ics - (char *) ptr) < ptr->header.length; ++j) {
         switch (ics->type) {
@@ -99,28 +83,28 @@ rsdp *acpi_find_rsdp(void) {
 }
 
 bool acpi_parse_tables(void) {
-    global_rsdp = acpi_find_rsdp();
-    if (!global_rsdp) {
+    acpi_global_rsdp = acpi_find_rsdp();
+    if (!acpi_global_rsdp) {
         terminal_printf("ACPI: RSDP: not found\n");
         return false;
     }
-    if (!acpi_validate_rsdp(global_rsdp)) {
+    if (!acpi_validate_rsdp(acpi_global_rsdp)) {
         terminal_printf("ACPI: RSDP: validation failed\n");
         return false;
     }
-    global_rsdt = global_rsdp->rsdt;
-    if (!global_rsdt) {
+    acpi_global_rsdt = acpi_global_rsdp->rsdt;
+    if (!acpi_global_rsdt) {
         terminal_printf("ACPI: RSDT: not found\n");
         return false;
     }
-    if (!acpi_validate_table_header(&global_rsdt->header)) {
+    if (!acpi_validate_table_header(&acpi_global_rsdt->header)) {
         terminal_printf("ACPI: RSDT: validation failed\n");
         return false;
     }
-    int tables_count = acpi_get_tables_count(global_rsdt);
+    int tables_count = acpi_get_tables_count(acpi_global_rsdt);
     terminal_printf("ACPI: RSDT: table contains %d entries\n", tables_count);
     for (int i = 0; i < tables_count; ++i) {
-        acpi_description_header *header = global_rsdt->tables[i];
+        acpi_description_header *header = acpi_global_rsdt->tables[i];
         if (!acpi_validate_table_header(header)) {
             terminal_printf("ACPI: table %d: validation failed\n", i);
             continue;

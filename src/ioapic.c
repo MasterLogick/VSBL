@@ -1,6 +1,8 @@
 #include "ioapic.h"
 #include "terminal.h"
 
+io_apic_base global_io_apic_base;
+
 uint32_t io_apic_read_reg(io_apic_base base, uint8_t index) {
     base[0] = index;
     return *(uint32_t *) (base + 0x10);
