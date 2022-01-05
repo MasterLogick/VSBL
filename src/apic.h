@@ -1,6 +1,10 @@
 #ifndef APIC_C
 #define APIC_C
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -41,5 +45,9 @@ uint32_t apic_get_current_count_register(apic_base base);
 void apic_enable_spurious_interrupts(apic_base base);
 
 uint32_t apic_get_errors(apic_base base);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //APIC_C

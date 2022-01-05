@@ -87,38 +87,6 @@ void terminal_writestring(char *data) {
     terminal_write(data, strlen(data));
 }
 
-#define INT8_STRING_MAX_LEN 8
-
-void terminal_print_int8(uint8_t val, int radix, bool full) {
-    char str[INT8_STRING_MAX_LEN];
-    for (int i = INT8_STRING_MAX_LEN - 1; i >= 0; --i) {
-        str[i] = val % radix;
-        if (str[i] >= 0xa) {
-            str[i] += 'a' - 0xa;
-        } else {
-            str[i] += '0';
-        }
-        val /= radix;
-        if (!full && val == 0) {
-            terminal_write(&str[i], INT8_STRING_MAX_LEN - i);
-            return;
-        }
-    }
-    switch (radix) {
-        case 8:
-            terminal_write(&str[INT8_STRING_MAX_LEN - 11], 11);
-            break;
-        case 10:
-            terminal_write(&str[INT8_STRING_MAX_LEN - 10], 10);
-            break;
-        case 16:
-            terminal_write(&str[INT8_STRING_MAX_LEN - 8], 8);
-            break;
-        default:
-            terminal_write(str, INT8_STRING_MAX_LEN);
-    }
-}
-
 #define INT32_STRING_MAX_LEN 32
 
 void terminal_print_int32(uint32_t val, int radix, bool full) {
@@ -151,7 +119,7 @@ void terminal_print_int32(uint32_t val, int radix, bool full) {
     }
 }
 
-void terminal_printf(char *format, ...) {
+void terminal_printf(const char *format, ...) {
     pr_list list;
     _pr_start_asm(&list, &format);
     int arg = 0;
@@ -180,14 +148,7 @@ void terminal_printf(char *format, ...) {
                     break;
                 case 'd':
                 case 'i':
-                    if (len == 0) {
-                        terminal_print_int32(pr_arg, 10, full);
-                    } else {
-                        uint8_t *ptr = (uint8_t *) pr_arg;
-                        for (int i = len - 1; i >= 0; --i) {
-                            terminal_print_int8(ptr[i], 10, full);
-                        }
-                    }
+                    terminal_print_int32(pr_arg, 10, full);
                     break;
                 case 's':
                     if (len == 0) {
@@ -197,14 +158,7 @@ void terminal_printf(char *format, ...) {
                     }
                     break;
                 case 'x':
-                    if (len == 0) {
-                        terminal_print_int32(pr_arg, 16, full);
-                    } else {
-                        uint8_t *ptr = (uint8_t *) pr_arg;
-                        for (int i = len - 1; i >= 0; --i) {
-                            terminal_print_int8(ptr[i], 16, full);
-                        }
-                    }
+                    terminal_print_int32(pr_arg, 16, full);
                     break;
                 case '%':
                     terminal_putchar('%');

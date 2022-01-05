@@ -1,6 +1,10 @@
 #ifndef IOAPIC_H
 #define IOAPIC_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdint.h>
 #include "apic.h"
 
@@ -19,5 +23,9 @@ uint32_t io_apic_read_reg(io_apic_base base, uint8_t index);
 void io_apic_write_reg(io_apic_base base, uint8_t index, uint32_t data);
 
 void io_apic_redirect_irq(io_apic_base base, uint8_t irq, apic_base apic_b, uint8_t vector);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //IOAPIC_H

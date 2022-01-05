@@ -1,6 +1,10 @@
 #ifndef ACPI_H
 #define ACPI_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -149,5 +153,9 @@ extern rsdp *acpi_global_rsdp;
 extern rsdt *acpi_global_rsdt;
 extern fadt *acpi_global_fadt;
 extern madt *acpi_global_madt;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //ACPI_H

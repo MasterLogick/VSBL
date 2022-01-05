@@ -49,7 +49,7 @@ void (*idt_handlers[IDT_DESCRIPTORS_COUNT])(void) = {
 
 };
 
-idt_descriptor idt_create_descriptor(void *handler_ptr) {
+idt_descriptor idt_create_descriptor(void (*handler_ptr)(void)) {
     idt_descriptor descriptor;
     descriptor.entry[0] = (uint16_t) (uintptr_t) handler_ptr;
     descriptor.entry[1] = 0x8;

@@ -40,13 +40,14 @@ bool acpi_parse_madt(madt *ptr) {
     ics_header *ics = &ptr->ics[0];
     for (int j = 0; (uint32_t) ((char *) ics - (char *) ptr) < ptr->header.length; ++j) {
         switch (ics->type) {
-            case 0:
+            case 0: {
                 terminal_printf("ACPI: MADT: ics table %d: structure type: processor local APIC\n", j);
                 ics_processor_local_apic *apic = (ics_processor_local_apic *) ics;
                 terminal_printf("ACPI: MADT: ics table %d: processor UID %d -> APIC %d\n",
                                 j, apic->processor_uid, apic->apic_id);
                 break;
-            case 1:
+            }
+            case 1: {
                 terminal_printf("ACPI: MADT: ics table %d: structure type: IO APIC\n", j);
                 ics_io_apic *io_apic = (ics_io_apic *) ics;
                 terminal_printf("ACPI: MADT: ics table %d: IO APIC id: %d\n", j, io_apic->io_apic_id);
@@ -55,7 +56,8 @@ bool acpi_parse_madt(madt *ptr) {
                                 io_apic->global_system_interrupt_base);
                 global_io_apic_base = io_apic->io_apic;
                 break;
-            case 2:
+            }
+            case 2: {
                 terminal_printf("ACPI: MADT: ics table %d: structure type: interrupt source override\n", j);
                 ics_iso *iso = (ics_iso *) ics;
                 terminal_printf("ACPI: MADT: ics table %d: interrupt source override: bus %d source %d:\n",
@@ -63,9 +65,11 @@ bool acpi_parse_madt(madt *ptr) {
                 terminal_printf("ACPI: MADT: ics table %d: interrupt source override: global system interrupt: %d\n",
                                 j, iso->global_system_interrupt);
                 break;
-            default:
+            }
+            default: {
                 terminal_printf("ACPI: MADT: ics table %d: structure type: unknown(%d)\n", j, *ics);
                 break;
+            }
         }
         ics = (ics_header *) (((char *) ics) + ics->length);
     }

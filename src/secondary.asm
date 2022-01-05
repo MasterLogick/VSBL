@@ -2,7 +2,7 @@ BITS 32
 section .secondary_bootsection
 
 extern stack_top
-extern kmain
+extern _Z5kmainv
 
 global _protected_mode_entry_asm
 _protected_mode_entry_asm:
@@ -13,7 +13,7 @@ _protected_mode_entry_asm:
     mov fs, ax
     mov gs, ax
     mov esp, stack_top
-    call kmain
+    call _Z5kmainv
     jmp $
 .end:
 size _protected_mode_entry_asm _protected_mode_entry_asm.end - _protected_mode_entry_asm

@@ -1,6 +1,10 @@
 #ifndef PS2_H
 #define PS2_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -65,5 +69,9 @@ void ps2_write_to_second_device(uint8_t data);
 bool ps2_reset_first_device(void);
 
 bool ps2_reset_second_device(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //PS2_H

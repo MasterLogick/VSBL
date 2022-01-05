@@ -38,9 +38,9 @@ void memset(void *dst, char ch, size_t size) {
     }
 }
 
-bool memcmp(void *ptr1, void *ptr2, size_t size) {
-    char *ptr_chr1 = ptr1;
-    char *ptr_chr2 = ptr2;
+bool memcmp(const void *ptr1, const void *ptr2, size_t size) {
+    char *ptr_chr1 = (char *) ptr1;
+    char *ptr_chr2 = (char *) ptr2;
     while (size--) {
         if (*ptr_chr1++ != *ptr_chr2++)return false;
     }
