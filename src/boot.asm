@@ -5,11 +5,14 @@
 ;N - no hdd drives found
 ;D - the first hard drive sector read error
 ;K - secondary bootloader code read error
+;M - memory map obtaining error
 
 BITS 16
 
 extern kernel_sectors_count
 extern _protected_mode_entry_asm
+extern pmm_conventional_blocks
+extern pmm_conventional_blocks_count
 
 section .stack
 align 16
@@ -27,6 +30,11 @@ _kernel_entry_asm:
     in al, 0x92
     or al, 2
     out 0x92, al
+
+    ;disable PIC
+    mov al, 0xff
+    out 0xa1, al
+    out 0x21, al
 
     ;check A20 memory bus line enabled
     xor ax, ax
@@ -77,6 +85,51 @@ _kernel_entry_asm:
     mov al, 'K'
     jc .err
 
+    ; get memory map
+    clc
+    xor ebx, ebx
+    xor si, si
+    xor ax, ax
+    mov es, ax
+    mov di, pmm_conventional_blocks
+    mov ecx, 24
+    mov eax, 0xE820
+    mov edx, 'PAMS'
+    mov dword [es:di + 20], dword 1
+    int 0x15
+    jc .m_err
+    cmp eax, 'PAMS'
+    jne .m_err
+    jmp .m_entry_process
+
+.m_get_entry:
+    clc
+    mov eax, 0xe820
+    mov ecx, 24
+    mov edx, 'PAMS'
+    mov dword [es:di + 20], dword 1
+    int 0x15
+    jc .m_end
+    test ebx, ebx
+    jz .m_end
+
+.m_entry_process:
+    jcxz .m_get_entry
+    add di, 24
+    inc si
+    cmp si, 30
+    jge .m_err
+    jmp .m_get_entry
+
+.m_err:
+    mov al, 'M'
+    jmp .err
+
+.m_end:
+    inc si
+    mov [pmm_conventional_blocks_count], si
+    clc
+
     ;setup GDT
     xor ax, ax
     mov ds, ax
@@ -99,10 +152,12 @@ size _kernel_entry_asm _kernel_entry_asm.end - _kernel_entry_asm
 ;al = ascii code to print
 global _error_print_asm
 _error_print_asm:
+    pushf
     push ax
     mov ah, 0x0e
     int 0x10
     pop ax
+    popf
     ret
 .end:
 size _error_print_asm _error_print_asm.end - _error_print_asm
@@ -110,6 +165,7 @@ size _error_print_asm _error_print_asm.end - _error_print_asm
 ;al = byte to print in binary format
 global _binary_print_asm
 _binary_print_asm:
+    pushf
     push ax
     push bx
     push cx
@@ -127,6 +183,7 @@ _binary_print_asm:
     pop cx
     pop bx
     pop ax
+    popf
     ret
 .end:
 size _binary_print_asm _binary_print_asm.end - _binary_print_asm

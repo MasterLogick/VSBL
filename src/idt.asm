@@ -79,9 +79,15 @@ size _idt_int_test_handler_asm _idt_int_test_handler_asm.end - _idt_int_test_han
 global _idt_int_DF_handler_asm
 _idt_int_DF_handler_asm:
     pushad
+    mov eax, [esp + 8*4 + 2*4]
+    mov ebx, [esp + 8*4 + 1*4]
+    mov ecx, [esp + 8*4]
+    push eax
+    push ebx
+    push ecx
     push aIntDFMsg
     call terminal_printf
-    add esp, 4
+    add esp, 4*4
     popad
     iretd
 .end:
@@ -142,6 +148,6 @@ aIntFallbackMsg db "Fallback interrupt handler reached. Freezing...", 0x0a, "   
     "   EAX=0x%!x", 0x0a, "   EIP=0x%!x", 0x0a, "    CS=0x%!x", 0x0a, "EFLAGS=0x%!x", 0x0a, 0
 aInt3Msg db "Breakpoint at address: %x", 0x0a, 0
 aIntTestMsg db "Test msg EIP=%!x CS=%!x EFLAGS=%!x", 0x0a, 0
-aIntDFMsg db "Abort #DF at EIP=%!x CS=%!x EFLAGS=%!x", 0x0a, 0
+aIntDFMsg db 0x0a, "Abort #DF at EIP=%!x CS=%!x EFLAGS=%!x", 0x0a, 0
 aIntTimerMsg db "Timer reached zero", 0x0a, 0
 aIntAPICErrorMsg db "APIC errors: %x", 0x0a, 0

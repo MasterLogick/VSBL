@@ -8,6 +8,7 @@
 #include "util.h"
 #include "keyboard.h"
 #include "ps2.h"
+#include "physical_memory_manager.h"
 
 union conv {
     char data[4 * 4 + 1];
@@ -25,6 +26,7 @@ void local_k_handler(uint8_t scancode, char key, uint32_t event) {
 void kmain(void) {
     idt_init();
     terminal_initialize();
+    pmm_extract_usable_blocks();
     _idt_enable_hardware_interrupts_asm();
     proc_name.data[16] = 0;
     proc_name.conv[0] = _get_cpuid_leaf_asm(0, 0, CPUID_EBX);
@@ -50,4 +52,8 @@ void kmain(void) {
     }
     io_apic_redirect_irq(global_io_apic_base, 1, apic_base, 35);
     keyboard_set_local_event_handler(local_k_handler);
+    for (int i = 0; i < pmm_conventional_blocks_count; ++i) {
+        terminal_printf("PMM: range %d: start: %!x%!x, length: %!x%!x\n",
+                        i, pmm_conventional_blocks[i].base_addr, pmm_conventional_blocks[i].length);
+    }
 }

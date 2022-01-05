@@ -43,7 +43,7 @@ bool acpi_parse_madt(madt *ptr) {
             case 0:
                 terminal_printf("ACPI: MADT: ics table %d: structure type: processor local APIC\n", j);
                 ics_processor_local_apic *apic = (ics_processor_local_apic *) ics;
-                terminal_printf("ACPI: MADT: ics table %d processor UID %d -> APIC %d\n",
+                terminal_printf("ACPI: MADT: ics table %d: processor UID %d -> APIC %d\n",
                                 j, apic->processor_uid, apic->apic_id);
                 break;
             case 1:
