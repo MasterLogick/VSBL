@@ -1,31 +1,38 @@
-# Very Simple BootLoader
+# VSBL - Very Simple BootLoader
 
-It is a very simple bootlader that can load kernel written in C.
+VSBL is a very simple bootloader and a set of fundamental modules that can load kernel written in C.
 
 Kernel is loaded in protected 32-bit mode.
 
-Entry point in C code is  `void kmain()` function in `src/kernel.c` 
+Entry point for C code is  `void kmain(void)` function in `src/kernel.c`
 
 # Build
 
 ## Requirements
 
-`yasm`, `gcc`, `ld` and `objcopy`
+`make`, `yasm`, `cc`, `ld` and `objcopy`
 
 ## Compilation
 
 ```bash
-./build.sh
+make
 ```
 
-## For test in Virtualbox VM
+There are two versions of compiled kernel image: `./out/boot.img` (Version for VirtualBox) or `./out/boot/img.old` (
+Version for booting on real machine)
 
-### For the first time:
+## VirtualBox VM
+
+You can test your kernel in VirtualBox virtual machine.
+
+### To create VM:
+
 ```bash
 ./init.sh
 ```
 
-### For every test:
+### To start VM:
+
 ```bash
-./test.sh
+make run_vm
 ```
