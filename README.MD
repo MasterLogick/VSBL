@@ -1,16 +1,16 @@
 # VSBL - Very Simple BootLoader
 
-VSBL is a very simple bootloader and a set of fundamental modules that can load kernel written in C.
+VSBL is a very simple bootloader and a set of fundamental modules that can load kernel written in C++.
 
 Kernel is loaded in protected 32-bit mode.
 
-Entry point for C code is  `void kmain(void)` function in `src/kernel.c`
+Entry point for C++ code is  `void kmain()` function in `src/Kernel.cpp`
 
 # Build
 
 ## Requirements
 
-`make`, `yasm`, `cc`, `ld` and `objcopy`
+`make`, `yasm`, `g++`, `ld` and `objcopy`
 
 ## Compilation
 

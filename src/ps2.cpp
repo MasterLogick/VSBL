@@ -1,9 +1,9 @@
 #include "ps2.h"
-#include "io.h"
-#include "acpi.h"
+#include "IO.h"
+#include "ACPI.h"
 #include "terminal.h"
 #include "util.h"
-#include "idt.h"
+#include "IDT.h"
 
 #define DATA_PORT 0x60
 #define STATUS_PORT 0x64
@@ -21,7 +21,7 @@ void ps2_exec_command(uint8_t command) {
 }
 
 bool ps2_init(void) {
-    if (!(acpi_global_fadt->IAPC_BOOT_ARCH & 0x2)) {
+    if (!(GlobalFADT->IAPC_BOOT_ARCH & 0x2)) {
         terminal_printf("PS/2: this PC doesn't have PS/2 controller\n");
         return false;
     }

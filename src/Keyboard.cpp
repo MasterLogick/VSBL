@@ -1,11 +1,11 @@
-#include "keyboard.h"
+#include "Keyboard.h"
 #include <stdbool.h>
 #include "ps2.h"
 
 #define KEY_COUNT 0x100
 
 bool keyboard[KEY_COUNT];
-char lookup_table[KEY_COUNT] = {
+char lookupTable[KEY_COUNT] = {
         0,
         0,
         '1',
@@ -265,7 +265,7 @@ char lookup_table[KEY_COUNT] = {
 };
 
 //todo use list for multiple handlers
-keyboard_event_handler local_handler;
+KeyboardEventHandler localHandler;
 
 #define KEYBOARD_FIRST_BLOCK_END 0x79
 #define KEYBOARD_SECOND_BLOCK_START 0x80
@@ -360,31 +360,31 @@ keyboard_event_handler local_handler;
 #define K_KEYPAD_F_ELEVEN 0x57
 #define K_KEYPAD_F_TWELVE 0x58
 
-bool global_keyboard_second_block_event = false;
+bool globalKeyboardSecondBlockEvent = false;
 
-void keyboard_global_handle_event() {
+void KeyboardGlobalEventHandler() {
     uint8_t scancode = ps2_read_response();
     if (scancode == K_SECOND_PART_SCANCODE) {
-        global_keyboard_second_block_event = true;
-        if (local_handler)local_handler(scancode, '\0', K_SECOND_PART_SCANCODE);
+        globalKeyboardSecondBlockEvent = true;
+        if (localHandler)localHandler(scancode, '\0', K_SECOND_PART_SCANCODE);
         return;
     }
-    if (!global_keyboard_second_block_event) {
+    if (!globalKeyboardSecondBlockEvent) {
         if (scancode <= KEYBOARD_FIRST_BLOCK_END) {
             bool pressed = keyboard[scancode];
             keyboard[scancode] = true;
-            if (local_handler)
-                local_handler(scancode, lookup_table[scancode], pressed ? KEYBOARD_KEY_REPEAT : KEYBOARD_KEY_PRESSED);
+            if (localHandler)
+                localHandler(scancode, lookupTable[scancode], pressed ? KEYBOARD_KEY_REPEAT : KEYBOARD_KEY_PRESSED);
         } else {
             keyboard[scancode - KEYBOARD_SECOND_BLOCK_START] = false;
-            if (local_handler)
-                local_handler(scancode, lookup_table[scancode - KEYBOARD_SECOND_BLOCK_START], KEYBOARD_KEY_RELEASED);
+            if (localHandler)
+                localHandler(scancode, lookupTable[scancode - KEYBOARD_SECOND_BLOCK_START], KEYBOARD_KEY_RELEASED);
         }
     } else {
-        global_keyboard_second_block_event = false;
+        globalKeyboardSecondBlockEvent = false;
     }
 }
 
-void keyboard_set_local_event_handler(keyboard_event_handler handler) {
-    local_handler = handler;
+void KeyboardSetLocalEventHandler(KeyboardEventHandler handler) {
+    localHandler = handler;
 }

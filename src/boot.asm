@@ -11,8 +11,7 @@ BITS 16
 
 extern kernel_sectors_count
 extern _protected_mode_entry_asm
-extern pmm_conventional_blocks
-extern pmm_conventional_blocks_count
+extern GlobalMemoryLayout
 
 section .stack
 align 16
@@ -91,7 +90,7 @@ _kernel_entry_asm:
     xor si, si
     xor ax, ax
     mov es, ax
-    mov di, pmm_conventional_blocks
+    mov di, GlobalMemoryLayout
     mov ecx, 24
     mov eax, 0xE820
     mov edx, 'PAMS'
@@ -127,7 +126,7 @@ _kernel_entry_asm:
 
 .m_end:
     inc si
-    mov [pmm_conventional_blocks_count], si
+    mov [GlobalMemoryLayout + 24 * 30], si
     clc
 
     ;setup GDT

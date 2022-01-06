@@ -1,21 +1,20 @@
 BITS 32
 section .text
 
-extern terminal_printf
-extern apic_eoi
-extern apic_get_base
-extern apic_get_errors
-extern keyboard_global_handle_event
+extern _Z15terminal_printfPKcz
+extern _ZN4APIC3eoiEv
+extern _Z7getAPICv
+extern _Z26KeyboardGlobalEventHandlerv
 
 ; void _idt_load_table_asm(uint16_t size, void *idt_ptr)
 global _idt_load_table_asm
 _idt_load_table_asm:
     sub esp, 8
-    mov ax, [esp+8+4]
+    mov ax, [esp + 8 + 4]
     dec ax
     mov [esp], ax
-    mov eax, [esp+8+8]
-    mov [esp+2], eax
+    mov eax, [esp + 8 + 8]
+    mov [esp + 2], eax
     lidt [esp]
     add esp, 8
     ret
@@ -27,7 +26,7 @@ global _idt_int_3_handler_asm
 _idt_int_3_handler_asm:
     pushad
     push aInt3Msg
-    call terminal_printf
+    call _Z15terminal_printfPKcz
     add esp, 4
     popad
     iretd
@@ -39,7 +38,7 @@ global _idt_int_fallback_handler_asm
 _idt_int_fallback_handler_asm:
     pushad
     push aIntFallbackMsg
-    call terminal_printf
+    call _Z15terminal_printfPKcz
     add esp, 4
     jmp $
     popad
@@ -68,7 +67,7 @@ global _idt_int_test_handler_asm
 _idt_int_test_handler_asm:
     pushad
     push aIntTestMsg
-    call terminal_printf
+    call _Z15terminal_printfPKcz
     add esp, 4
     popad
     iretd
@@ -86,7 +85,7 @@ _idt_int_DF_handler_asm:
     push ebx
     push ecx
     push aIntDFMsg
-    call terminal_printf
+    call _Z15terminal_printfPKcz
     add esp, 4*4
     popad
     iretd
@@ -98,10 +97,10 @@ global _idt_int_apic_timer_handler_asm
 _idt_int_apic_timer_handler_asm:
     pushad
     push aIntTimerMsg
-    call terminal_printf
-    call apic_get_base
+    call _Z15terminal_printfPKcz
+    call _Z7getAPICv
     mov [esp], eax
-    call apic_eoi
+    call _ZN4APIC3eoiEv
     add esp, 4
     popad
     iretd
@@ -112,15 +111,14 @@ size _idt_int_apic_timer_handler_asm _idt_int_apic_timer_handler_asm.end - _idt_
 global _idt_int_apic_error_handler_asm
 _idt_int_apic_error_handler_asm:
     pushad
-    call apic_get_base
-    push eax
-    call apic_get_errors
-    mov [esp], eax
+    call _Z7getAPICv
+    add eax, 0x280
+    push dword [eax]
     push aIntAPICErrorMsg
-    call terminal_printf
-    call apic_get_base
+    call _Z15terminal_printfPKcz
+    call _Z7getAPICv
     mov [esp], eax
-    call apic_eoi
+    call _ZN4APIC3eoiEv
     add esp, 8
     popad
     iretd
@@ -131,10 +129,10 @@ size _idt_int_apic_error_handler_asm _idt_int_apic_error_handler_asm.end - _idt_
 global _idt_int_keyboard_handler_asm
 _idt_int_keyboard_handler_asm:
     pushad
-    call keyboard_global_handle_event
-    call apic_get_base
+    call _Z26KeyboardGlobalEventHandlerv
+    call _Z7getAPICv
     push eax
-    call apic_eoi
+    call _ZN4APIC3eoiEv
     add esp, 4
     popad
     iretd

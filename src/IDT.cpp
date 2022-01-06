@@ -1,9 +1,13 @@
-#include "idt.h"
+#include "IDT.h"
 #include <stddef.h>
+#include "Attributes.h"
 
-idt_descriptor idt_table[IDT_DESCRIPTORS_COUNT] __attribute__ ((aligned (16)));
+#define IDT_DESCRIPTORS_COUNT 36
 
-void (*idt_handlers[IDT_DESCRIPTORS_COUNT])(void) = {
+
+IDTDescriptor table[IDT_DESCRIPTORS_COUNT] ALIGNED(16);
+
+void (*handlers[IDT_DESCRIPTORS_COUNT])(void) = {
         //                                    // From Table 6-1, “Protected-Mode Exceptions and Interrupts" in the Intel® 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A
         //                                    // +--------+----------+--------------------------------------------+------------+------------+---------------------------------------------------
         //                                    // | Vector | Mnemonic | Description                                | Type       | Error code | Source
@@ -49,22 +53,22 @@ void (*idt_handlers[IDT_DESCRIPTORS_COUNT])(void) = {
 
 };
 
-idt_descriptor idt_create_descriptor(void (*handler_ptr)(void)) {
-    idt_descriptor descriptor;
-    descriptor.entry[0] = (uint16_t) (uintptr_t) handler_ptr;
+IDTDescriptor createDescriptor(void (*handler)(void)) {
+    IDTDescriptor descriptor;
+    descriptor.entry[0] = (uint16_t) (uintptr_t) handler;
     descriptor.entry[1] = 0x8;
     descriptor.entry[2] = 0b1000111000000000;
-    descriptor.entry[3] = (uint16_t) ((uint32_t) (uintptr_t) handler_ptr >> 16);
+    descriptor.entry[3] = (uint16_t) ((uint32_t) (uintptr_t) handler >> 16);
     return descriptor;
 }
 
-void idt_init(void) {
+void initIDT() {
     for (int i = 0; i < IDT_DESCRIPTORS_COUNT; ++i) {
-        if (idt_handlers[i] != NULL) {
-            idt_table[i] = idt_create_descriptor(idt_handlers[i]);
+        if (handlers[i] != NULL) {
+            table[i] = createDescriptor(handlers[i]);
         } else {
-            idt_table[i] = idt_create_descriptor(_idt_int_fallback_handler_asm);
+            table[i] = createDescriptor(_idt_int_fallback_handler_asm);
         }
     }
-    _idt_load_table_asm(IDT_DESCRIPTORS_COUNT * sizeof(idt_descriptor), idt_table);
+    _idt_load_table_asm(IDT_DESCRIPTORS_COUNT * sizeof(IDTDescriptor), table);
 }

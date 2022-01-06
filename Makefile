@@ -1,8 +1,8 @@
-CPP = c++
+CPP = g++
 LD = ld
 ASM = yasm
 ASMFLAGS = -f elf32
-CPPFLAGS = -m32 --freestanding -fno-pic -Wall -Wextra -Werror -O1 -fno-exceptions -fno-rtti
+CPPFLAGS = -static -m32 --freestanding -fno-PIC -fno-PIE -Wall -Wextra -Werror -O1 -fno-exceptions -fno-rtti -nostartfiles -nodefaultlibs
 LDFLAGS = -T linker.ld -O1 -nostdlib -m elf_i386
 
 KERNEL_PADDING := 512
@@ -13,7 +13,7 @@ SRC_DIR=./src
 BUILD_DIR=./out
 MACHINE_NAME=Test_VM
 
-SRCS := $(shell find $(SRC_DIR) -name '*.c' -or -name '*.asm' -or -name '*.c')
+SRCS := $(shell find $(SRC_DIR) -name '*.c' -or -name '*.asm' -or -name '*.cpp')
 SRC_DIRS := $(shell find $(SRC_DIR)/ -type d)
 BUILD_DIRS := $(SRC_DIRS:$(SRC_DIR)/%=$(BUILD_DIR)/%)
 OBJS := $(SRCS:$(SRC_DIR)/%=$(BUILD_DIR)/%.o)
