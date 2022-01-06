@@ -61,6 +61,8 @@ struct APIC {
     void enableSpuriousInterrupts();
 };
 
+static_assert(sizeof(APIC) == 0x3f0, "APIC must be 0x3f0 bytes long");
+
 APIC *getAPIC();
 
 bool isAPICEnabled();
