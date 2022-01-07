@@ -13,17 +13,15 @@ extern kernel_sectors_count
 extern _protected_mode_entry_asm
 extern GlobalMemoryLayout
 
-section .stack
-align 16
-resb 16*1024 ; 16 KiB
-
 section .primary_bootsection
 global _kernel_entry_asm
 
 _kernel_entry_asm:
     ;load temporary stack pointer
     cli
-    mov esp, 0x7bf0
+    xor ax, ax
+    mov ss, ax
+    mov sp, 0x7bf0
 
     ;enable A20 memory bus
     in al, 0x92

@@ -9,6 +9,7 @@
 #include "Keyboard.h"
 #include "ps2.h"
 #include "PhysicalMemoryManager.h"
+#include "GlobalConstructorCaller.h"
 
 union conv {
     char data[4 * 4 + 1];
@@ -23,7 +24,8 @@ void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     (void) event;
 }
 
-void kmain(void) {
+void kmain() {
+    CallGlobalConstructors();
     initIDT();
     terminal_initialize();
     GlobalMemoryLayout.extractConventionalBlocks();
