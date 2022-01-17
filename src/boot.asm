@@ -72,7 +72,28 @@ _kernel_entry_asm:
     je .br 
     loop .l
     ;load kernel from hard drive
+
 .br:
+    mov bx, 1-127
+    mov cx, kernel_sectors_count
+    mov edi, transfer_buffer_ptr - 127 * 512
+.read_loop:
+    add bx, 127
+    cmp cx, 127
+    jl .read_br_else
+    sub cx, 127
+    jmp .read_br_end
+.read_br_else:
+    xor cx, cx
+.read_br_end:
+    mov [data_packet.lba], bx
+    add edi, 127 * 512
+    mov [data_packet.ptr_addr], di
+    shr edi, 16
+    shl edi, 16-4
+    mov [data_packet.ptr_segm], di
+    shl edi, 8
+    mov di, [data_packet.ptr_addr]
     xor ax, ax
     mov ds, ax
     mov ah, 0x42
@@ -80,6 +101,8 @@ _kernel_entry_asm:
     int 0x13
     mov al, 'K'
     jc .err
+    test cx, cx
+    jnz .read_loop
 
     ; get memory map
     clc
@@ -194,9 +217,13 @@ test_data_packet:
 data_packet:
     db 0x10 ; packet size
     db 0    ; reserved (0)
-    dw kernel_sectors_count  ; blocks to read
-    dd transfer_buffer_ptr
-    dq 0x1
+    dw 127  ; blocks to read
+.ptr_addr:
+    dw 0
+.ptr_segm:
+    dw 0
+.lba:
+    dd 0,0
 
 align 4
 GDT_DESCRIPTION:
