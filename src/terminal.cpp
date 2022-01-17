@@ -22,11 +22,11 @@ enum vga_color {
     VGA_COLOR_WHITE = 15,
 };
 
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
+static inline constexpr uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
     return fg | bg << 4;
 }
 
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
+static inline constexpr uint16_t vga_entry(unsigned char uc, uint8_t color) {
     return (uint16_t) uc | (uint16_t) color << 8;
 }
 
@@ -38,7 +38,7 @@ size_t terminal_column;
 uint8_t terminal_color;
 uint16_t *terminal_buffer;
 
-void terminal_initialize(void) {
+void terminal_initialize() {
     terminal_row = 0;
     terminal_column = 0;
     terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
@@ -51,7 +51,7 @@ void terminal_initialize(void) {
     }
 }
 
-void terminal_shift_up(void) {
+void terminal_shift_up() {
     memcpy(terminal_buffer + VGA_WIDTH, terminal_buffer, VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t));
     memset(terminal_buffer + VGA_WIDTH * (VGA_HEIGHT - 1), 0, VGA_WIDTH * sizeof(uint16_t));
 }

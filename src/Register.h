@@ -4,10 +4,10 @@
 #include "stdint.h"
 
 class Register {
-    uint32_t val;
+    volatile uint32_t val;
     uint32_t reserved[3];
 public:
-    uint32_t &operator()() {
+    volatile uint32_t &operator()() {
         return val;
     }
 };

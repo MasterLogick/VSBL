@@ -14,6 +14,8 @@ class IOAPIC {
 
 public:
     void redirectIRQ(uint8_t irq, APIC *apic, uint8_t vector);
+
+    uint8_t getRedirectionEntryCount();
 };
 
 extern IOAPIC *GlobalIOAPIC;

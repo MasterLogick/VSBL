@@ -1,31 +1,26 @@
 #ifndef PHYSICALMEMORYMANAGER_H
 #define PHYSICALMEMORYMANAGER_H
 
-#include "Attributes.h"
 #include <stdint.h>
 #include <stddef.h>
+#include "Attributes.h"
+#include "MemoryBlock.h"
+#include "PhysicalMemoryBlock.h"
 
 #define PMM_MAX_ENTRY_COUNT 30
 
-struct MemoryBlock {
-    uint64_t address;
-    uint64_t length;
-    uint32_t type;
-    uint32_t acpi;
 
-    void removeIntersections(MemoryBlock *blocks, int count);
-} PACKED;
-
-struct MemoryLayout {
-    MemoryBlock conventionalMemory[PMM_MAX_ENTRY_COUNT];
+struct PhysicalMemoryManager {
+    PhysicalMemoryBlock conventionalMemory[PMM_MAX_ENTRY_COUNT];
     int conventionalBlocksCount;
-    MemoryBlock unusableMemory[PMM_MAX_ENTRY_COUNT];
+    PhysicalMemoryBlock unusableMemory[PMM_MAX_ENTRY_COUNT];
     int unusableBlocksCount;
 
-    void addConventionalBlock(MemoryBlock block);
+    void addConventionalBlock(PhysicalMemoryBlock &block);
 
     void extractConventionalBlocks();
-} PACKED;
+};
 
-extern MemoryLayout GlobalMemoryLayout;
+extern PhysicalMemoryManager GlobalPMM;
+
 #endif //PHYSICALMEMORYMANAGER_H

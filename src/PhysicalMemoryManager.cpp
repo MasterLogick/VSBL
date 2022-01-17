@@ -2,18 +2,27 @@
 #include "terminal.h"
 
 
-MemoryLayout GlobalMemoryLayout;
-MemoryBlock pmm_predefined_unusable_blocks[2] = {
-        {0,       0x500,   2, 1},
-        {0x80000, 0x80000, 2, 1}
+const PhysicalMemoryBlock pmm_predefined_unusable_blocks[3] = {
+        {0,           0x600,      2, 1},
+        {0x80000,     0x80000,    2, 1},
+        {0x100000000, 0xffffffff, 2, 1}
 };
 
-void MemoryBlock::removeIntersections(MemoryBlock *blocks, int count) {
-    uint64_t start = address;
-    uint64_t end = address + length - 1;
+PhysicalMemoryManager GlobalPMM;
+
+extern struct MemoryMap {
+    PhysicalMemoryBlock blocks[PMM_MAX_ENTRY_COUNT];
+    int blocksCount;
+} _PAM_asm;
+
+void PhysicalMemoryBlock::removeIntersections(PhysicalMemoryBlock *blocks, int count) {
+    uint64_t start = base;
+    uint64_t end = this->end();
     for (int i = 0; i < count; ++i) {
-        uint64_t unusable_start = blocks[i].address;
-        uint64_t unusable_end = blocks[i].address + blocks[i].length - 1;
+        uint64_t unusable_start = blocks[i].base;
+        uint64_t unusable_end = blocks[i].end();
+        if (blocks[i].length == 0)
+            terminal_printf("%d %!x%!x %!x%!x\n    %!x%!x %!x%!x\n", i, start, end, unusable_start, unusable_end);
         if (unusable_end >= start && unusable_start <= start) {
             if (unusable_end != UINT64_MAX) {
                 start = unusable_end + 1;
@@ -29,15 +38,15 @@ void MemoryBlock::removeIntersections(MemoryBlock *blocks, int count) {
             }
         }
         if (start >= end) {
-            address = 0;
+            base = 0;
             length = 0;
             type = 0;
             acpi = 0;
             return;
         }
         if (unusable_start > start && unusable_end < end) {
-            MemoryBlock low = {start, end - start + 1, 1, acpi};
-            GlobalMemoryLayout.addConventionalBlock(low);
+            PhysicalMemoryBlock low{start, end - start + 1, 1, acpi};
+            GlobalPMM.addConventionalBlock(low);
             if (unusable_end != UINT64_MAX) {
                 start = unusable_end + 1;
             } else {
@@ -45,23 +54,23 @@ void MemoryBlock::removeIntersections(MemoryBlock *blocks, int count) {
             }
         }
         if (start >= end) {
-            address = 0;
+            base = 0;
             length = 0;
             type = 0;
             acpi = 0;
             return;
         }
     }
-    address = start;
+    base = start;
     length = end - start + 1;
 }
 
-void MemoryLayout::addConventionalBlock(MemoryBlock block) {
+void PhysicalMemoryManager::addConventionalBlock(PhysicalMemoryBlock &block) {
     block.removeIntersections(unusableMemory, unusableBlocksCount);
     if (block.length == 0) {
         return;
     }
-    block.removeIntersections(pmm_predefined_unusable_blocks,
+    block.removeIntersections(const_cast<PhysicalMemoryBlock *>(pmm_predefined_unusable_blocks),
                               sizeof(pmm_predefined_unusable_blocks) / sizeof(pmm_predefined_unusable_blocks[0]));
     if (block.length == 0) {
         return;
@@ -77,19 +86,19 @@ void MemoryLayout::addConventionalBlock(MemoryBlock block) {
     }
 }
 
-void MemoryLayout::extractConventionalBlocks() {
-    MemoryBlock potentionalMemory[PMM_MAX_ENTRY_COUNT];
+void PhysicalMemoryManager::extractConventionalBlocks() {
+    PhysicalMemoryBlock potentionalMemory[PMM_MAX_ENTRY_COUNT];
     int potentialBlockCount = 0;
     unusableBlocksCount = 0;
-    for (int i = 0; i < conventionalBlocksCount; ++i) {
-        if (conventionalMemory[i].length == 0) {
+    for (int i = 0; i < _PAM_asm.blocksCount; ++i) {
+        if (_PAM_asm.blocks[i].length == 0) {
             continue;
         }
-        if (conventionalMemory[i].type == 1 && (conventionalMemory[i].acpi & 1)) {
-            potentionalMemory[potentialBlockCount] = conventionalMemory[i];
+        if (_PAM_asm.blocks[i].type == 1 && (_PAM_asm.blocks[i].acpi & 1)) {
+            potentionalMemory[potentialBlockCount] = _PAM_asm.blocks[i];
             potentialBlockCount++;
         } else {
-            unusableMemory[unusableBlocksCount] = conventionalMemory[i];
+            unusableMemory[unusableBlocksCount] = _PAM_asm.blocks[i];
             unusableBlocksCount++;
         }
     }

@@ -11,11 +11,11 @@ BITS 16
 
 extern kernel_sectors_count
 extern _protected_mode_entry_asm
-extern GlobalMemoryLayout
 
 section .primary_bootsection
-global _kernel_entry_asm
+bootsection_start:
 
+global _kernel_entry_asm
 _kernel_entry_asm:
     ;load temporary stack pointer
     cli
@@ -67,7 +67,7 @@ _kernel_entry_asm:
     mov al, 'D'
     jc .err
     mov eax, [signature]
-    mov ebx, [signature + 0x200]
+    mov ebx, [transfer_buffer_ptr + signature - bootsection_start]
     cmp eax, ebx
     je .br 
     loop .l
@@ -76,7 +76,6 @@ _kernel_entry_asm:
     xor ax, ax
     mov ds, ax
     mov ah, 0x42
-    mov dl, drive_number
     mov si, data_packet
     int 0x13
     mov al, 'K'
@@ -88,7 +87,7 @@ _kernel_entry_asm:
     xor si, si
     xor ax, ax
     mov es, ax
-    mov di, GlobalMemoryLayout
+    mov di, _PAM_asm
     mov ecx, 24
     mov eax, 0xE820
     mov edx, 'PAMS'
@@ -101,7 +100,7 @@ _kernel_entry_asm:
 
 .m_get_entry:
     clc
-    mov eax, 0xe820
+    mov eax, 0xE820
     mov ecx, 24
     mov edx, 'PAMS'
     mov dword [es:di + 20], dword 1
@@ -124,7 +123,7 @@ _kernel_entry_asm:
 
 .m_end:
     inc si
-    mov [GlobalMemoryLayout + 24 * 30], si
+    mov [_PAM_asm + 24 * 30], si
     clc
 
     ;setup GDT
@@ -198,7 +197,6 @@ data_packet:
     dw kernel_sectors_count  ; blocks to read
     dd transfer_buffer_ptr
     dq 0x1
-drive_number equ 0x80
 
 align 4
 GDT_DESCRIPTION:
@@ -242,8 +240,15 @@ db 0x0
 
 .end:
 
-times 0x200 - 6 - ($ - $$) db 0
+times 0x200 - 2 - 4 * 16 - 4 - ($ - $$) db 0
 signature: db "VSBL"
+times 4 dq 0, 0
 db 0x55
 db 0xaa
+bootsection_end:
 transfer_buffer_ptr:
+
+section .data
+global _PAM_asm
+_PAM_asm:
+resb 3 * 8 * 30 + 8

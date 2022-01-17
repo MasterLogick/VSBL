@@ -10,6 +10,8 @@
 #include "ps2.h"
 #include "PhysicalMemoryManager.h"
 #include "GlobalConstructorCaller.h"
+#include "Attributes.h"
+#include "VirtualMemoryManager.h"
 
 union conv {
     char data[4 * 4 + 1];
@@ -24,12 +26,11 @@ void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     (void) event;
 }
 
-void kmain() {
-    CallGlobalConstructors();
+NORETURN void kmain() {
     initIDT();
     terminal_initialize();
-    GlobalMemoryLayout.extractConventionalBlocks();
-    _idt_enable_hardware_interrupts_asm();
+    GlobalPMM.extractConventionalBlocks();
+    CallGlobalConstructors();
     proc_name.data[16] = 0;
     proc_name.conv[0] = _get_cpuid_leaf_asm(0, 0, CPUID_EBX);
     proc_name.conv[1] = _get_cpuid_leaf_asm(0, 0, CPUID_EDX);
@@ -53,10 +54,18 @@ void kmain() {
         terminal_printf("PS/2: initialisation failed\n");
     }
     GlobalIOAPIC->redirectIRQ(1, apic, 35);
+    terminal_printf("IO APIC: redirection entry count: %d\n", GlobalIOAPIC->getRedirectionEntryCount());
     KeyboardSetLocalEventHandler(local_k_handler);
-    for (int i = 0; i < GlobalMemoryLayout.conventionalBlocksCount; ++i) {
-        terminal_printf("PMM: range %d: start: %!x%!x, length: %!x%!x\n",
-                        i, GlobalMemoryLayout.conventionalMemory[i].address,
-                        GlobalMemoryLayout.conventionalMemory[i].length);
+    auto mem = GlobalVMM.freeBaseMemory;
+    VirtualMemoryBlock *bl = mem->search(GREATER_OR_EQUAL, 0);
+    for (int i = 0; bl; ++i) {
+        terminal_printf("VMM: free space %d: %!x %!x\n", i, bl->base, bl->length);
+        bl = mem->search(GREATER, bl->base);
     }
+    terminal_printf("VMM: page: %!x %!x\n", GlobalVMM.pageDescriptor.base, GlobalVMM.pageDescriptor.length);
+    for (int i = 0; i < 4; ++i) {
+        terminal_printf("VMM: page: %!x\n", GlobalVMM.pageAllocate(512));
+    }
+    terminal_printf("AAA");
+    while (true);
 }
