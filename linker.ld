@@ -36,5 +36,5 @@ SECTIONS{
 	stack_top = .;
 	Kernel_End = .;
 
-	kernel_sectors_count = (SIZEOF(.secondary_bootsection) + SIZEOF(.text) + SIZEOF(.rodata) + SIZEOF(.data) + SIZEOF(.init_array) + SIZEOF(.bss) + 512 - 1) / 512 - 1;
+	kernel_sectors_count = (SIZEOF(.secondary_bootsection) + SIZEOF(.text) + SIZEOF(.rodata) + SIZEOF(.data) + SIZEOF(.init_array) + SIZEOF(.bss) + 512 - 1) / 512;
 }

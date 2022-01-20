@@ -37,14 +37,12 @@ VirtualMemoryManager::VirtualMemoryManager() :
             VirtualMemoryBlock high;
             block.split(kernel, &high);
             blockFound = true;
-            usedMemory->insert(kernel.base, kernel);
             if (block.length) {
                 insertFreeBlock(block);
             }
             if (high.length) {
                 insertFreeBlock(high);
             }
-            usedMemory->insert(kernel.base, kernel);
         } else {
             insertFreeBlock(block);
         }
@@ -75,7 +73,7 @@ void VirtualMemoryManager::insertFreeBlock(VirtualMemoryBlock &block) {
     } else {
         high = block;
     }
-    low = VirtualMemoryBlock(min(low.base, block.base), max(block.end(), high.end()) - min(low.base, block.base) + 1);
+    low = VirtualMemoryBlock(low.base, high.end() - low.base + 1);
     freeBaseMemory->insert(low.base, low);
     Vector<VirtualMemoryBlock, PageAllocator<void>> **vecPtr = freeLengthMemory->search(EQUAL, low.length);
     Vector<VirtualMemoryBlock, PageAllocator<void>> *vec;
@@ -86,6 +84,7 @@ void VirtualMemoryManager::insertFreeBlock(VirtualMemoryBlock &block) {
     } else {
         vec = *vecPtr;
     }
+    terminal_printf("VMM: free mem insert: %!x %!x\n", low.base, low.length);
     vec->push_back(low);
 }
 
@@ -107,16 +106,19 @@ void VirtualMemoryManager::removeFreeBlock(VirtualMemoryBlock &block) {
 }
 
 void *VirtualMemoryManager::pageAllocate(size_t n) {
-    if (n < pageDescriptor.length) {
-        pageDescriptor.length += n;
-        void *retVal = reinterpret_cast<void *>(pageDescriptor.base);
-        pageDescriptor.base += n;
-        return retVal;
+    if (n + sizeof(UsedMemoryTree::Node) <= pageDescriptor.length) {
+        pageDescriptor.length -= n + sizeof(UsedMemoryTree::Node);
+        UsedMemoryTree::Node *descriptor = new(reinterpret_cast<void *>(pageDescriptor.base))UsedMemoryTree::Node(
+                n + sizeof(UsedMemoryTree::Node),
+                VirtualMemoryBlock(pageDescriptor.base, n + sizeof(UsedMemoryTree::Node)));
+        pageDescriptor.base += n + sizeof(UsedMemoryTree::Node);
+        usedMemory->insertNode(descriptor);
+        return reinterpret_cast<void *>(descriptor->val.base + sizeof(UsedMemoryTree::Node));
     } else {
-        Vector<VirtualMemoryBlock, PageAllocator<void>> **vecPtr = freeLengthMemory->search(GREATER_OR_EQUAL,
-                                                                                            n + VMM_PAGE_SIZE);
+        Vector<VirtualMemoryBlock, PageAllocator<void>> **vecPtr =
+                freeLengthMemory->search(GREATER_OR_EQUAL, n + sizeof(UsedMemoryTree::Node) + VMM_PAGE_SIZE);
         if (vecPtr) {
-            pageDescriptor = (*vecPtr)->operator[]((*vecPtr)->getSize());
+            pageDescriptor = (*vecPtr)->pop_back();
             removeFreeBlock(pageDescriptor);
             return pageAllocate(n);
         } else {
@@ -126,10 +128,16 @@ void *VirtualMemoryManager::pageAllocate(size_t n) {
 }
 
 void *VirtualMemoryManager::malloc(size_t size) {
-    (void) size;
-    return nullptr;
+    return pageAllocate(size);
 }
 
 void VirtualMemoryManager::free(void *ptr) {
-    (void) ptr;
+    VirtualMemoryBlock *blockPtr = usedMemory->search(LESS_OR_EQUAL, reinterpret_cast<base_t>(ptr));
+    if (blockPtr) {
+        VirtualMemoryBlock block = *blockPtr;
+        usedMemory->remove(block.base);
+        insertFreeBlock(block);
+    } else {
+        VIRTUAL_MEMORY_MANAGER_PANIC("VIRTUAL MEMORY FREE ERROR");
+    }
 }

@@ -11,12 +11,6 @@
 #include "PhysicalMemoryManager.h"
 #include "GlobalConstructorCaller.h"
 #include "Attributes.h"
-#include "VirtualMemoryManager.h"
-
-union conv {
-    char data[4 * 4 + 1];
-    uint32_t conv[4];
-} proc_name;
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {
@@ -31,12 +25,6 @@ NORETURN void kmain() {
     terminal_initialize();
     GlobalPMM.extractConventionalBlocks();
     CallGlobalConstructors();
-    proc_name.data[16] = 0;
-    proc_name.conv[0] = _get_cpuid_leaf_asm(0, 0, CPUID_EBX);
-    proc_name.conv[1] = _get_cpuid_leaf_asm(0, 0, CPUID_EDX);
-    proc_name.conv[2] = _get_cpuid_leaf_asm(0, 0, CPUID_ECX);
-    terminal_printf("CPUID: CPU primary name: %s\n", proc_name.data);
-    terminal_printf("CPUID: max leaf: %d\n", _get_cpuid_leaf_asm(0, 0, CPUID_EAX));
     APIC *apic = getAPIC();
     apic->enableSpuriousInterrupts();
     apic->initLVT();
@@ -56,16 +44,6 @@ NORETURN void kmain() {
     GlobalIOAPIC->redirectIRQ(1, apic, 35);
     terminal_printf("IO APIC: redirection entry count: %d\n", GlobalIOAPIC->getRedirectionEntryCount());
     KeyboardSetLocalEventHandler(local_k_handler);
-    auto mem = GlobalVMM.freeBaseMemory;
-    VirtualMemoryBlock *bl = mem->search(GREATER_OR_EQUAL, 0);
-    for (int i = 0; bl; ++i) {
-        terminal_printf("VMM: free space %d: %!x %!x\n", i, bl->base, bl->length);
-        bl = mem->search(GREATER, bl->base);
-    }
-    terminal_printf("VMM: page: %!x %!x\n", GlobalVMM.pageDescriptor.base, GlobalVMM.pageDescriptor.length);
-    for (int i = 0; i < 4; ++i) {
-        terminal_printf("VMM: page: %!x\n", GlobalVMM.pageAllocate(512));
-    }
-    terminal_printf("AAA");
+    terminal_printf("APIC: RSDP version %d\n", GlobalRSDP->revision);
     while (true);
 }

@@ -3,9 +3,9 @@
 
 
 const PhysicalMemoryBlock pmm_predefined_unusable_blocks[3] = {
-        {0,           0x600,      2, 1},
-        {0x80000,     0x80000,    2, 1},
-        {0x100000000, 0xffffffff, 2, 1}
+        {0,           0x600,              2, 1},
+        {0x80000,     0x80000,            2, 1},
+        {0x100000000, 0xFFFFFFFF00000000, 2, 1}
 };
 
 PhysicalMemoryManager GlobalPMM;

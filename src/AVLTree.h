@@ -20,6 +20,7 @@ enum QueryType {
 
 template<typename K, typename V, typename Alloc = Allocator<>>
 class AVLTree {
+public:
     struct Node {
         K key;
         V val;
@@ -29,10 +30,15 @@ class AVLTree {
         Node *right;
         Node *parent;
 
-        Node() : balance(0), height(0), left(nullptr), right(nullptr), parent(this) {
+        Node() : balance(0), height(0), left(nullptr), right(nullptr), parent(this) {}
+
+        Node(K key, V val) : Node() {
+            this->key = key;
+            this->val = val;
         }
     };
 
+private:
     Node *rootNode;
     typename AllocatorTraits<Alloc>::template Rebind<Node>::Other::BaseType allocator;
 
@@ -125,39 +131,11 @@ class AVLTree {
     }
 
     template<typename Val>
-    void insertT(K key, Val value) {
-        if (!rootNode) {
-            rootNode = new(allocator.allocate(1))Node();
-            rootNode->key = key;
-            rootNode->val = value;
-        } else {
-            Node *n = rootNode;
-            while (true) {
-                if (key > n->key) {
-                    if (n->right != nullptr) {
-                        n = n->right;
-                    } else {
-                        break;
-                    }
-                } else {
-                    if (n->left != nullptr) {
-                        n = n->left;
-                    } else {
-                        break;
-                    }
-                }
-            }
-            Node *insertedNode = new(allocator.allocate(1))Node();
-            insertedNode->parent = n;
-            insertedNode->key = key;
-            insertedNode->val = value;
-            if (key > n->key) {
-                n->right = insertedNode;
-            } else {
-                n->left = insertedNode;
-            }
-            update(insertedNode);
-        }
+    inline void insertT(K key, Val value) {
+        Node *node = new(allocator.allocate(1))Node();
+        node->key = key;
+        node->val = value;
+        insertNode(node);
     }
 
     Node *searchNode(QueryType type, K key, Node *n) {
@@ -231,6 +209,37 @@ class AVLTree {
 public:
 
     AVLTree() : rootNode(nullptr), allocator() {}
+
+    void insertNode(Node *node) {
+        if (!rootNode) {
+            rootNode = node;
+        } else {
+            Node *n = rootNode;
+            while (true) {
+                if (n->key > n->key) {
+                    if (n->right != nullptr) {
+                        n = n->right;
+                    } else {
+                        break;
+                    }
+                } else {
+                    if (n->left != nullptr) {
+                        n = n->left;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            Node *insertedNode = node;
+            insertedNode->parent = n;
+            if (insertedNode->key > n->key) {
+                n->right = insertedNode;
+            } else {
+                n->left = insertedNode;
+            }
+            update(insertedNode);
+        }
+    }
 
     inline void insert(K key, const V &value) {
         insertT(key, value);
