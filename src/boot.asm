@@ -12,8 +12,8 @@ BITS 16
 extern kernel_sectors_count
 extern _protected_mode_entry_asm
 
-section .primary_bootsection
-bootsection_start:
+section .real_mode_section
+bootloader_start:
 
 global _kernel_entry_asm
 _kernel_entry_asm:
@@ -38,8 +38,8 @@ _kernel_entry_asm:
     mov ds, ax
     not ax
     mov es, ax
-    mov di, 0x7dfe
-    mov si, 0x7e0e
+    mov di, signature
+    mov si, signature + 0x100000-0xffff0
     mov word bx, [es:si]
     not bx
     mov word [ds:di], bx
@@ -67,7 +67,7 @@ _kernel_entry_asm:
     mov al, 'D'
     jc .err
     mov eax, [signature]
-    mov ebx, [transfer_buffer_ptr + signature - bootsection_start]
+    mov ebx, [transfer_buffer_ptr + signature - bootloader_start]
     cmp eax, ebx
     je .br 
     loop .l
@@ -156,8 +156,7 @@ _kernel_entry_asm:
     lgdt [GDT_DESCRIPTION]
 
     ;transfer to protected mode
-    mov eax, cr0
-    or eax, 1
+    mov eax, 0x11
     mov cr0, eax
     jmp 0x08:_protected_mode_entry_asm
 
@@ -169,43 +168,17 @@ _kernel_entry_asm:
 size _kernel_entry_asm _kernel_entry_asm.end - _kernel_entry_asm
 
 ;al = ascii code to print
-global _error_print_asm
 _error_print_asm:
-    pushf
-    push ax
-    mov ah, 0x0e
-    int 0x10
-    pop ax
-    popf
-    ret
-.end:
-size _error_print_asm _error_print_asm.end - _error_print_asm
-
-;al = byte to print in binary format
-global _binary_print_asm
-_binary_print_asm:
-    pushf
-    push ax
+    push ds
     push bx
-    push cx
-    mov ah, 0x0e
-    mov cx, 8
-    mov bl, al
-.l1:
-    shl bl, 1
-    mov al, '0'
-    jnc .zero
-    inc al
-.zero:
-    int 0x10
-    loop .l1
-    pop cx
+    mov bx, 0xb000
+    mov ds, bx
+    mov bx, 0x8000
+    mov [ds:bx], al
     pop bx
-    pop ax
-    popf
+    pop ds
     ret
 .end:
-size _binary_print_asm _binary_print_asm.end - _binary_print_asm
 
 test_data_packet:
     db 0x10 ; packet size
@@ -225,19 +198,28 @@ data_packet:
 .lba:
     dd 0,0
 
+times 0x200 - 2 - 4 * 16 - 4 - ($ - $$) db 0
+signature: db "VSBL"
+times 4 dq 0, 0
+db 0x55
+db 0xaa
+bootsection_end:
+transfer_buffer_ptr:
+
+section .data
+
 align 4
 GDT_DESCRIPTION:
 dw GDT.end - GDT - 1
-dd GDT
-dd 0
+dd GDT, 0
 
 align 8
 GDT:
 
 .gdte_zero:
-dq 0
+dd 0, 0
 
-.gdte_code:
+.gdte_code_compat_mode:
 ; limit 0-15 bits
 dw 0xffff
 ; base 0-15 bits
@@ -251,7 +233,7 @@ db 11001111b
 ; base 24-31 bits
 db 0x0
 
-.gdte_data:
+.gdte_data_compat_mode:
 ; limit 0-15 bits
 dw 0xffff
 ; base 0-15 bits
@@ -265,17 +247,35 @@ db 11001111b
 ; base 24-31 bits
 db 0x0
 
+.gdte_code_long_mode:
+; limit 0-15 bits
+dw 0xffff
+; base 0-15 bits
+dw 0x0
+; base 16-23 bits
+db 0x0
+; access byte
+db 10011010b
+; flags, limit 16-19 bits
+db 10101111b
+; base 24-31 bits
+db 0x0
+
+.gdte_data_long_mode:
+; limit 0-15 bits
+dw 0xffff
+; base 0-15 bits
+dw 0x0
+; base 16-23 bits
+db 0x0
+; access byte
+db 10010010b
+; flags, limit 16-19 bits
+db 10101111b
+; base 24-31 bits
+db 0x0
 .end:
 
-times 0x200 - 2 - 4 * 16 - 4 - ($ - $$) db 0
-signature: db "VSBL"
-times 4 dq 0, 0
-db 0x55
-db 0xaa
-bootsection_end:
-transfer_buffer_ptr:
-
-section .data
 global _PAM_asm
 _PAM_asm:
 resb 3 * 8 * 30 + 8

@@ -84,7 +84,6 @@ void VirtualMemoryManager::insertFreeBlock(VirtualMemoryBlock &block) {
     } else {
         vec = *vecPtr;
     }
-    terminal_printf("VMM: free mem insert: %!x %!x\n", low.base, low.length);
     vec->push_back(low);
 }
 

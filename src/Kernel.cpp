@@ -45,5 +45,6 @@ NORETURN void kmain() {
     terminal_printf("IO APIC: redirection entry count: %d\n", GlobalIOAPIC->getRedirectionEntryCount());
     KeyboardSetLocalEventHandler(local_k_handler);
     terminal_printf("APIC: RSDP version %d\n", GlobalRSDP->revision);
+    terminal_printf("CPUID: max extended value: %x\n", _get_cpuid_leaf_asm(80000008, 0, CPUID_EAX) & 0xff);
     while (true);
 }
