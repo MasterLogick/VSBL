@@ -31,20 +31,20 @@ bool ps2_test_controller();
 bool ps2_test_first_port();
 
 //todo investigate
-//void ps2_diagnostic_dump(void);
+//void ps2_diagnostic_dump();
 
 void ps2_disable_first_port();
 
 void ps2_enable_first_port();
 
 //todo investigate
-//uint8_t ps2_read_controller_port(void);
+//uint8_t ps2_read_controller_port();
 
 //todo investigate
-//void ps2_copy_input_low_to_status(void);
+//void ps2_copy_input_low_to_status();
 
 //todo investigate
-//void ps2_copy_input_high_to_status(void);
+//void ps2_copy_input_high_to_status();
 
 uint8_t ps2_read_controller_output_port();
 

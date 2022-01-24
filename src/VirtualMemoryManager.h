@@ -14,7 +14,7 @@
 
 class VirtualMemoryManager;
 
-extern VirtualMemoryManager GlobalVMM;
+extern VirtualMemoryManager *GlobalVMM;
 
 class VirtualMemoryManager {
     template<typename>
@@ -35,7 +35,7 @@ class VirtualMemoryManager {
         };
 
         inline T *allocate(SizeType n) {
-            return reinterpret_cast<T *>(GlobalVMM.pageAllocate(sizeof(T) * n));
+            return reinterpret_cast<T *>(GlobalVMM->pageAllocateAligned(sizeof(T) * n));
         }
 
         void deallocate(T *ptr) {
@@ -65,7 +65,7 @@ public:
 
     void free(void *ptr);
 
-    void *pageAllocate(size_t n);
+    void *pageAllocateAligned(size_t n, size_t align = 1);
 };
 
 #endif //VIRTUALMEMORYMANAGER_H

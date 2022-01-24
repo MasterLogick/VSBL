@@ -8,8 +8,8 @@
 template<typename V, typename Alloc = Allocator<>>
 class Vector {
     V *array;
-    size_t size;
-    size_t capacity;
+    int size;
+    int capacity;
     typename AllocatorTraits<Alloc>::template Rebind<V>::Other::BaseType allocator;
 
     template<typename T>
@@ -18,6 +18,7 @@ class Vector {
             resize(size * 2);
         }
         array[size] = val;
+        size++;
     }
 
 public:
@@ -27,7 +28,7 @@ public:
         array = new(allocator.allocate(capacity))V[capacity];
     }
 
-    inline size_t getSize() {
+    inline int getSize() {
         return size;
     }
 
@@ -44,7 +45,7 @@ public:
         return this->operator[](getSize());
     }
 
-    void remove(size_t i) {
+    void remove(int i) {
         if (i < size) {
             copy(array + i, array + i + 1, size - i - 1);
             size--;
@@ -55,7 +56,7 @@ public:
         return array[i];
     }
 
-    void resize(size_t n) {
+    void resize(int n) {
         if (capacity < n) {
             V *tmpArray = new(allocator.allocate(n))V[n];
             copy(tmpArray, array, capacity);

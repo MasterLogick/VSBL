@@ -1,16 +1,14 @@
-#include <stddef.h>
 #include "terminal.h"
-#include "CpuID.h"
 #include "APIC.h"
 #include "IDT.h"
-#include "ACPI.h"
+#include "ACPI/ACPI.h"
 #include "IOAPIC.h"
-#include "util.h"
 #include "Keyboard.h"
 #include "ps2.h"
 #include "PhysicalMemoryManager.h"
 #include "GlobalConstructorCaller.h"
 #include "Attributes.h"
+#include "VirtualMemoryManager.h"
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {
@@ -20,12 +18,16 @@ void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     (void) event;
 }
 
+uint8_t vmm[sizeof(VirtualMemoryManager)];
+
 NORETURN void kmain() {
     initIDT();
     terminal_initialize();
     GlobalPMM.extractConventionalBlocks();
+    GlobalVMM = reinterpret_cast<VirtualMemoryManager *>(vmm);
+    GlobalVMM = new(vmm)VirtualMemoryManager();
     CallGlobalConstructors();
-    APIC *apic = getAPIC();
+    APIC *apic = APIC::getAPIC();
     apic->enableSpuriousInterrupts();
     apic->initLVT();
     apic->setTimerDivider(DIV_128);
@@ -45,6 +47,6 @@ NORETURN void kmain() {
     terminal_printf("IO APIC: redirection entry count: %d\n", GlobalIOAPIC->getRedirectionEntryCount());
     KeyboardSetLocalEventHandler(local_k_handler);
     terminal_printf("APIC: RSDP version %d\n", GlobalRSDP->revision);
-    terminal_printf("CPUID: max extended value: %x\n", _get_cpuid_leaf_asm(80000008, 0, CPUID_EAX) & 0xff);
+//    terminal_printf("CPUID: max extended value: %x\n", _get_cpuid_leaf_asm(80000008, 0, CPUID_EAX) & 0xff);
     while (true);
 }

@@ -1,7 +1,7 @@
-BITS 32
+BITS 64
 section .text
 
-; void _int3_asm(void)
+; void _int3_asm()
 global _int3_asm
 _int3_asm:
     int 3
@@ -9,7 +9,7 @@ _int3_asm:
 .end:
 size _int3_asm _int3_asm.end - _int3_asm
 
-; uint32_t _get_time_asm(void)
+; uint32_t _get_time_asm()
 global _get_time_asm
 _get_time_asm:
     rdtsc

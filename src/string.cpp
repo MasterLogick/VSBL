@@ -1,53 +1,48 @@
 #include "string.h"
 
 void memcpy(void *src, void *dst, size_t size) {
-    char *dst0 = (char *) dst;
-    char *src0 = (char *) src;
-    while ((uintptr_t) src0 & 3 && size) {
-        *dst0++ = *src0++;
-        size--;
-    }
-    uint32_t *dst1 = (uint32_t *) dst0;
-    uint32_t *src1 = (uint32_t *) src0;
-    while (size >= 4) {
+    uint64_t *dst1 = (uint64_t *) dst;
+    uint64_t *src1 = (uint64_t *) src;
+    while (size >= 8) {
         *dst1++ = *src1++;
-        size -= 4;
+        size -= 8;
     }
-    dst0 = (char *) dst1;
-    src0 = (char *) src1;
+    uint8_t *dst0 = (uint8_t *) dst1;
+    uint8_t *src0 = (uint8_t *) src1;
     while (size--) {
         *dst0++ = *src0++;
     }
 }
 
 void memset(void *dst, char ch, size_t size) {
-    char *dst0 = (char *) dst;
-    while ((uintptr_t) dst0 & 3) {
+    uint8_t *dst0 = (uint8_t *) dst;
+    while ((uintptr_t) dst0 & 7) {
         *dst0++ = ch;
         size--;
     }
-    uint32_t l = ch | ch << 8 | ch << 16 | ch << 24;
-    uint32_t *dst1 = (uint32_t *) dst0;
-    while (size >= 4) {
+    uint64_t l = ((uint64_t) ch) | ((uint64_t) ch << 8) | ((uint64_t) ch << 16) | ((uint64_t) ch << 24) |
+                 ((uint64_t) ch << 32) | ((uint64_t) ch << 40) | ((uint64_t) ch << 48) | ((uint64_t) ch << 56);
+    uint64_t *dst1 = (uint64_t *) dst0;
+    while (size >= 8) {
         *dst1++ = l;
-        size -= 4;
+        size -= 8;
     }
-    dst0 = (char *) dst1;
+    dst0 = (uint8_t *) dst1;
     while (size--) {
         *dst0++ = ch;
     }
 }
 
 bool memcmp(const void *ptr1, const void *ptr2, size_t size) {
-    char *ptr_chr1 = (char *) ptr1;
-    char *ptr_chr2 = (char *) ptr2;
+    uint8_t *ptr_chr1 = (uint8_t *) ptr1;
+    uint8_t *ptr_chr2 = (uint8_t *) ptr2;
     while (size--) {
         if (*ptr_chr1++ != *ptr_chr2++)return false;
     }
     return true;
 }
 
-size_t strlen(char *str) {
+size_t strlen(const char *str) {
     size_t len = 0;
     while (str[len])
         len++;

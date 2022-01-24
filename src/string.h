@@ -11,6 +11,6 @@ void memset(void *dst, char ch, size_t size);
 
 bool memcmp(const void *ptr1, const void *ptr2, size_t size);
 
-size_t strlen(char *str);
+size_t strlen(const char *str);
 
 #endif //STRING_C

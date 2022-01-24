@@ -2,10 +2,9 @@
 #include "terminal.h"
 
 
-const PhysicalMemoryBlock pmm_predefined_unusable_blocks[3] = {
-        {0,           0x600,              2, 1},
-        {0x80000,     0x80000,            2, 1},
-        {0x100000000, 0xFFFFFFFF00000000, 2, 1}
+const PhysicalMemoryBlock pmm_predefined_unusable_blocks[] = {
+        {0,       0x600,   2, 1},
+        {0x80000, 0x80000, 2, 1}
 };
 
 PhysicalMemoryManager GlobalPMM;
@@ -16,13 +15,11 @@ extern struct MemoryMap {
 } _PAM_asm;
 
 void PhysicalMemoryBlock::removeIntersections(PhysicalMemoryBlock *blocks, int count) {
-    uint64_t start = base;
-    uint64_t end = this->end();
+    base_t start = base;
+    base_t end = this->end();
     for (int i = 0; i < count; ++i) {
-        uint64_t unusable_start = blocks[i].base;
-        uint64_t unusable_end = blocks[i].end();
-        if (blocks[i].length == 0)
-            terminal_printf("%d %!x%!x %!x%!x\n    %!x%!x %!x%!x\n", i, start, end, unusable_start, unusable_end);
+        base_t unusable_start = blocks[i].base;
+        base_t unusable_end = blocks[i].end();
         if (unusable_end >= start && unusable_start <= start) {
             if (unusable_end != UINT64_MAX) {
                 start = unusable_end + 1;
@@ -87,7 +84,7 @@ void PhysicalMemoryManager::addConventionalBlock(PhysicalMemoryBlock &block) {
 }
 
 void PhysicalMemoryManager::extractConventionalBlocks() {
-    PhysicalMemoryBlock potentionalMemory[PMM_MAX_ENTRY_COUNT];
+    PhysicalMemoryBlock potentialMemory[PMM_MAX_ENTRY_COUNT];
     int potentialBlockCount = 0;
     unusableBlocksCount = 0;
     for (int i = 0; i < _PAM_asm.blocksCount; ++i) {
@@ -95,7 +92,7 @@ void PhysicalMemoryManager::extractConventionalBlocks() {
             continue;
         }
         if (_PAM_asm.blocks[i].type == 1 && (_PAM_asm.blocks[i].acpi & 1)) {
-            potentionalMemory[potentialBlockCount] = _PAM_asm.blocks[i];
+            potentialMemory[potentialBlockCount] = _PAM_asm.blocks[i];
             potentialBlockCount++;
         } else {
             unusableMemory[unusableBlocksCount] = _PAM_asm.blocks[i];
@@ -108,7 +105,7 @@ void PhysicalMemoryManager::extractConventionalBlocks() {
                                                         sizeof(pmm_predefined_unusable_blocks[0]));
     conventionalBlocksCount = 0;
     for (int i = 0; i < potentialBlockCount; ++i) {
-        addConventionalBlock(potentionalMemory[i]);
+        addConventionalBlock(potentialMemory[i]);
     }
     terminal_printf("PMM: memory map ready\n");
     terminal_printf("PMM: total conventional blocks count: %d\n", conventionalBlocksCount);

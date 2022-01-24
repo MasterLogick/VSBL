@@ -3,7 +3,7 @@
 
 #define IA32_APIC_BASE_MSR 0x1B
 
-APIC *getAPIC() {
+APIC *APIC::getAPIC() {
     return (APIC *) (_msr_get_asm(IA32_APIC_BASE_MSR) & 0xfffff000);
 }
 

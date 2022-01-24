@@ -4,26 +4,17 @@
 #include <stdint.h>
 #include "MemoryBlock.h"
 
-typedef uint32_t base_t;
-typedef uint32_t length_t;
-
-struct VirtualMemoryBlock {
-    base_t base;
-    length_t length;
+struct VirtualMemoryBlock : public MemoryBlock {
     uint16_t flags;
 
-    explicit VirtualMemoryBlock(MemoryBlock block) : base(block.base), length(block.length), flags(0) {}
+    explicit VirtualMemoryBlock(MemoryBlock block) : MemoryBlock(block), flags(0) {}
 
-    constexpr VirtualMemoryBlock(base_t base, length_t length) : base(base), length(length), flags(0) {}
+    constexpr VirtualMemoryBlock(base_t base, length_t length) : MemoryBlock({base, length}), flags(0) {}
 
-    constexpr VirtualMemoryBlock(base_t base, length_t length, uint16_t flags) : base(base), length(length),
+    constexpr VirtualMemoryBlock(base_t base, length_t length, uint16_t flags) : MemoryBlock({base, length}),
                                                                                  flags(flags) {}
 
     VirtualMemoryBlock() = default;
-
-    inline base_t end() {
-        return base + length - 1;
-    }
 
     bool overlays(VirtualMemoryBlock &block) {
         return base <= block.base && block.end() <= end();

@@ -59,11 +59,11 @@ struct APIC {
     void alarmTimer(uint32_t time);
 
     void enableSpuriousInterrupts();
+
+    static APIC *getAPIC();
 };
 
 static_assert(sizeof(APIC) == 0x3f0, "APIC must be 0x3f0 bytes long");
-
-APIC *getAPIC();
 
 bool isAPICEnabled();
 

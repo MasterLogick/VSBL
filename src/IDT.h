@@ -5,7 +5,12 @@
 #include "Attributes.h"
 
 struct IDTDescriptor {
-    uint16_t entry[4];
+    uint16_t entry[8];
+
+public:
+    IDTDescriptor();
+
+    explicit IDTDescriptor(void (*handler)());
 } PACKED;
 
 void initIDT();
@@ -33,6 +38,10 @@ void _idt_int_apic_timer_handler_asm();
 void _idt_int_apic_error_handler_asm();
 
 void _idt_int_keyboard_handler_asm();
+
+void _idt_int_page_fault_asm();
+
+void _idt_int_invalid_opcode_asm();
 
 #ifdef __cplusplus
 }

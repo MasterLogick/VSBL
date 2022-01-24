@@ -35,21 +35,22 @@ static const size_t VGA_HEIGHT = 25;
 
 size_t terminal_row = 0;
 size_t terminal_column = 0;
-uint8_t terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-uint16_t *const terminal_buffer = (uint16_t *) 0xB8000;
+const uint8_t terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+volatile uint16_t *volatile const terminal_buffer = reinterpret_cast<uint16_t *>(0xB8000);
 
 void terminal_initialize() {
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
-            const size_t index = y * VGA_WIDTH + x;
+            size_t index = y * VGA_WIDTH + x;
             terminal_buffer[index] = vga_entry(' ', terminal_color);
         }
     }
 }
 
 void terminal_shift_up() {
-    memcpy(terminal_buffer + VGA_WIDTH, terminal_buffer, VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t));
-    memset(terminal_buffer + VGA_WIDTH * (VGA_HEIGHT - 1), 0, VGA_WIDTH * sizeof(uint16_t));
+    memcpy((void *) (terminal_buffer + VGA_WIDTH), (void *) terminal_buffer,
+           VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t));
+    memset((void *) (terminal_buffer + VGA_WIDTH * (VGA_HEIGHT - 1)), 0, VGA_WIDTH * sizeof(uint16_t));
 }
 
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
@@ -79,15 +80,15 @@ void terminal_write(const char *data, size_t size) {
         terminal_putchar(data[i]);
 }
 
-void terminal_writestring(char *data) {
+void terminal_writestring(const char *data) {
     terminal_write(data, strlen(data));
 }
 
-#define INT32_STRING_MAX_LEN 32
+#define INT64_STRING_MAX_LEN 64
 
-void terminal_print_int32(uint32_t val, int radix, bool full) {
-    char str[INT32_STRING_MAX_LEN];
-    for (int i = INT32_STRING_MAX_LEN - 1; i >= 0; --i) {
+void terminal_print_int64(uint64_t val, int radix, bool full) {
+    char str[INT64_STRING_MAX_LEN];
+    for (int i = INT64_STRING_MAX_LEN - 1; i >= 0; --i) {
         str[i] = val % radix;
         if (str[i] >= 0xa) {
             str[i] += 'a' - 0xa;
@@ -96,27 +97,29 @@ void terminal_print_int32(uint32_t val, int radix, bool full) {
         }
         val /= radix;
         if (!full && val == 0) {
-            terminal_write(&str[i], INT32_STRING_MAX_LEN - i);
+            terminal_write(&str[i], INT64_STRING_MAX_LEN - i);
             return;
         }
     }
     switch (radix) {
         case 8:
-            terminal_write(&str[INT32_STRING_MAX_LEN - 11], 11);
+            terminal_write(&str[INT64_STRING_MAX_LEN - 22], 22);
             break;
         case 10:
-            terminal_write(&str[INT32_STRING_MAX_LEN - 10], 10);
+            terminal_write(&str[INT64_STRING_MAX_LEN - 20], 20);
             break;
         case 16:
-            terminal_write(&str[INT32_STRING_MAX_LEN - 8], 8);
+            terminal_write(&str[INT64_STRING_MAX_LEN - 16], 16);
             break;
         default:
-            terminal_write(str, INT32_STRING_MAX_LEN);
+            terminal_write(str, INT64_STRING_MAX_LEN);
     }
 }
 
 void terminal_printf(const char *format, ...) {
-    pr_list list;
+//    terminal_buffer[0] = vga_entry('a', vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
+    terminal_writestring(const_cast<char *>(format));
+    /*pr_list list;
     _pr_start_asm(&list, &format);
     int arg = 0;
     int len = 0;
@@ -124,7 +127,7 @@ void terminal_printf(const char *format, ...) {
     while (*format) {
         if (*format == '%') {
             format++;
-            uint32_t pr_arg = _pr_arg_asm(list, arg);
+            uint64_t pr_arg = _pr_arg_asm(list, arg);
             arg++;
             if (*format == '[') {
                 format++;
@@ -167,5 +170,5 @@ void terminal_printf(const char *format, ...) {
             terminal_putchar(*format);
         }
         format++;
-    }
+    }*/
 }

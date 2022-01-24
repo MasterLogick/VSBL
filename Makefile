@@ -1,9 +1,9 @@
 CPP = g++
 LD = ld
 ASM = yasm
-ASMFLAGS = -f elf32
-CPPFLAGS = -static -m32 -ffreestanding -fno-PIC -fno-PIE -Wall -Wextra -Werror -O2 -fno-exceptions -fno-rtti -nostartfiles -nodefaultlibs -nostdinc++
-LDFLAGS = -T linker.ld -O2 -nostdlib -m elf_i386
+ASMFLAGS = -f elf64
+CPPFLAGS = -static -m64 -ffreestanding -fno-PIC -fno-PIE -Wall -Wextra -Werror -O2 -fno-exceptions -fno-rtti -nostartfiles -nodefaultlibs -nostdinc++ -mno-red-zone -mno-mmx -mno-sse -mno-sse2
+LDFLAGS = -T linker.ld -O2 -nostdlib -m elf_x86_64
 
 KERNEL_PADDING := 512
 KERNEL_MIN_BLOCK_COUNT := 1024*1024
@@ -14,7 +14,7 @@ SRC_DIR := $(PROJECT_ROOT)/src
 BUILD_DIR := $(PROJECT_ROOT)/out
 MACHINE_NAME = Test_VM
 
-INCLUDE_FILES = placement_new.h new.h
+INCLUDE_FILES = placement_new.h
 INCLUDES = $(INCLUDE_FILES:%=-include $(SRC_DIR)/%)
 
 SRCS := $(shell find $(SRC_DIR) -name '*.c' -or -name '*.asm' -or -name '*.cpp')

@@ -1,9 +1,9 @@
 #include "ACPI.h"
-#include "string.h"
-#include "terminal.h"
+#include "../string.h"
+#include "../terminal.h"
 
 RSDP *GlobalRSDP;
-RSDT *GlobalRSDT;
+XSDT *GlobalXSDT;
 FADT *GlobalFADT;
 MADT *GlobalMADT;
 
@@ -15,8 +15,8 @@ bool DescriptionHeader::validate() {
     return !checksum;
 }
 
-int RSDT::getTablesCount() {
-    return (this->length - sizeof(DescriptionHeader)) / sizeof(void *);
+int XSDT::getTablesCount() {
+    return (length - sizeof(DescriptionHeader)) / sizeof(void *);
 }
 
 void FADT::parse() {
@@ -30,7 +30,12 @@ bool RSDP::validate() {
     for (int i = 0; i < 20; ++i) {
         checksum += chr_ptr[i];
     }
-    if (checksum != 0)return false;
+    if (!checksum)return false;
+    if (!revision)return false;
+    for (unsigned int i = 20; i < length; ++i) {
+        checksum += chr_ptr[i];
+    }
+    if (!checksum)return false;
     return true;
 }
 
@@ -71,18 +76,18 @@ void MADT::parse() {
                 break;
             }
         }
-        header = (ICSHeader *) (((char *) header) + header->length);
+        header = (ICSHeader *) (((uint8_t *) header) + header->length);
     }
 }
 
 RSDP *findRSDP() {
-    char *ptr = (char *) 0x0e0000;
+    uint8_t *ptr = reinterpret_cast<uint8_t *>(0x0e0000);
     for (; (uintptr_t) ptr < 0x0fffff; ptr++) {
         if (((RSDP *) ptr)->validate()) {
             return (RSDP *) ptr;
         }
     }
-    return (RSDP *) 0;
+    return nullptr;
 }
 
 bool parseACPITables() {
@@ -95,19 +100,19 @@ bool parseACPITables() {
         terminal_printf("ACPI: RSDP: validation failed\n");
         return false;
     }
-    GlobalRSDT = GlobalRSDP->rsdt;
-    if (!GlobalRSDT) {
-        terminal_printf("ACPI: RSDT: not found\n");
+    GlobalXSDT = GlobalRSDP->xsdt;
+    if (!GlobalXSDT) {
+        terminal_printf("ACPI: XSDT: not found\n");
         return false;
     }
-    if (!GlobalRSDT->validate()) {
-        terminal_printf("ACPI: RSDT: validation failed\n");
+    if (!GlobalXSDT->validate()) {
+        terminal_printf("ACPI: XSDT: validation failed\n");
         return false;
     }
-    int tablesCount = GlobalRSDT->getTablesCount();
-    terminal_printf("ACPI: RSDT: table contains %d entries\n", tablesCount);
+    int tablesCount = GlobalXSDT->getTablesCount();
+    terminal_printf("ACPI: XSDT: table contains %d entries\n", tablesCount);
     for (int i = 0; i < tablesCount; ++i) {
-        DescriptionHeader *header = GlobalRSDT->tables[i];
+        DescriptionHeader *header = GlobalXSDT->tables[i];
         if (!header->validate()) {
             terminal_printf("ACPI: table %d: validation failed\n", i);
             continue;

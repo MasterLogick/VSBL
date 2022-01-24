@@ -10,7 +10,7 @@ struct PhysicalMemoryBlock : public MemoryBlock {
 
     void removeIntersections(PhysicalMemoryBlock *blocks, int count);
 
-    constexpr inline PhysicalMemoryBlock(uint64_t base, uint64_t length, uint32_t type, uint32_t acpi) :
+    constexpr inline PhysicalMemoryBlock(base_t base, length_t length, uint32_t type, uint32_t acpi) :
             MemoryBlock({base, length}), type(type), acpi(acpi) {}
 
     PhysicalMemoryBlock() = default;

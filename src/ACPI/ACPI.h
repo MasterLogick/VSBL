@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "Attributes.h"
-#include "APIC.h"
-#include "IOAPIC.h"
+#include "../Attributes.h"
+#include "../APIC.h"
+#include "../IOAPIC.h"
 
 struct DescriptionHeader {
     char signature[4];
@@ -13,7 +13,7 @@ struct DescriptionHeader {
     uint8_t revision;
     uint8_t checksum;
     char OEMID[6];
-    char OEMTableID[8];
+    uint64_t OEMTableID;
     uint32_t OEMRevision;
     uint32_t CreatorID;
     uint32_t CreatorRevision;
@@ -21,19 +21,22 @@ struct DescriptionHeader {
     bool validate();
 } PACKED;
 
-struct RSDT;
+struct XSDT;
 
 struct RSDP {
     char signature[8];
     uint8_t checksum;
     char OEMID[6];
     uint8_t revision;
-    RSDT *rsdt;
+    uint32_t rsdtPtr;
+    uint32_t length;
+    XSDT *xsdt;
+    uint8_t extendedChecksum;
 
     bool validate();
 } PACKED;
 
-struct RSDT : public DescriptionHeader {
+struct XSDT : public DescriptionHeader {
     DescriptionHeader *tables[0];
 
     int getTablesCount();
@@ -123,7 +126,7 @@ struct ISO : public ICSHeader {
 bool parseACPITables();
 
 extern RSDP *GlobalRSDP;
-extern RSDT *GlobalRSDT;
+extern XSDT *GlobalXSDT;
 extern FADT *GlobalFADT;
 extern MADT *GlobalMADT;
 
