@@ -1,9 +1,9 @@
 #include "ps2.h"
 #include "IO.h"
-#include "ACPI/ACPI.h"
 #include "iostream.h"
 #include "util.h"
 #include "IDT.h"
+#include "ACPI/sdt/FADT.h"
 
 #define DATA_PORT 0x60
 #define STATUS_PORT 0x64

@@ -1,7 +1,6 @@
 #include "iostream.h"
 #include "APIC.h"
 #include "IDT.h"
-#include "ACPI/ACPI.h"
 #include "IOAPIC.h"
 #include "Keyboard.h"
 #include "ps2.h"
@@ -9,6 +8,7 @@
 #include "GlobalConstructorCaller.h"
 #include "Attributes.h"
 #include "VirtualMemoryManager.h"
+#include "ACPI/sdt/RSDP.h"
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {
@@ -38,7 +38,25 @@ NORETURN void kmain() {
          << "APIC: version: " << cout.HEX << (apic_version & 0xff) << cout.defaults
          << "\n" << "APIC: # of LVT entries: " << (((apic_version >> 16) & 0xff) + 1) << "\n"
          << "APIC: errors: " << apic->errorStatus() << "\n";
-    parseACPITables();
+    GlobalRSDP = RSDP::find();
+    if (!GlobalRSDP) {
+        cout << "ACPI: RSDP: not found\n";
+    } else {
+        if (!GlobalRSDP->isValid()) {
+            cout << "ACPI: RSDP: validation failed\n";
+        } else {
+            GlobalXSDT = GlobalRSDP->xsdt;
+            if (!GlobalXSDT) {
+                cout << "ACPI: XSDT: not found\n";
+            } else {
+                if (!GlobalXSDT->isValid()) {
+                    cout << "ACPI: XSDT: validation failed\n";
+                } else {
+                    GlobalXSDT->parseTables();
+                }
+            }
+        }
+    }
     if (!ps2_init()) {
         cout << "PS/2: initialisation failed\n";
     }
