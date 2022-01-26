@@ -17,7 +17,9 @@ _long_mode_entry_asm:
     mov gs, ax
     mov ss, ax
     mov rsp, stack_top
-    mov rbp, stack_top
+    push $
+    mov rbp, 0
+    push rbp
     mov ax, GDT64_TSS
     ltr ax
     jmp _Z5kmainv

@@ -1,5 +1,5 @@
 #include "VirtualMemoryManager.h"
-#include "terminal.h"
+#include "iostream.h"
 #include "Attributes.h"
 
 extern "C" {
@@ -10,9 +10,8 @@ extern char Kernel_End;
 VirtualMemoryManager *GlobalVMM;
 
 NORETURN void VIRTUAL_MEMORY_MANAGER_PANIC(const char *message) {
-    terminal_printf("VMM:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nVMM: PANIC: ");
-    terminal_printf(message);
-    terminal_printf("\nVMM:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nEXECUTION TERMINATED\n");
+    cout << "VMM:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nVMM: PANIC: " << message
+         << "\nVMM:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\nEXECUTION TERMINATED\n";
     while (true);
 }
 
@@ -39,24 +38,12 @@ VirtualMemoryManager::VirtualMemoryManager() :
             block.split(kernel, &high);
             blockFound = true;
             if (block.length) {
-                terminal_print_int64(block.base, 16, true);
-                terminal_printf(" - ");
-                terminal_print_int64(block.end(), 16, true);
-                terminal_printf("\n");
                 insertFreeBlock(block);
             }
             if (high.length) {
-                terminal_print_int64(high.base, 16, true);
-                terminal_printf(" - ");
-                terminal_print_int64(high.end(), 16, true);
-                terminal_printf("\n");
                 insertFreeBlock(high);
             }
         } else {
-            terminal_print_int64(block.base, 16, true);
-            terminal_printf(" - ");
-            terminal_print_int64(block.end(), 16, true);
-            terminal_printf("\n");
             insertFreeBlock(block);
         }
     }

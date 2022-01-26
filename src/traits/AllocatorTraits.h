@@ -1,7 +1,7 @@
 #ifndef ALLOC_TRAITS_H
 #define ALLOC_TRAITS_H
 
-#include "template_traits.h"
+#include "TemplateTraits.h"
 
 template<typename Alloc>
 struct AllocatorTraits {

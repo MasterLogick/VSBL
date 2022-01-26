@@ -18,7 +18,7 @@ struct DescriptionHeader {
     uint32_t CreatorID;
     uint32_t CreatorRevision;
 
-    bool validate();
+    bool isValid();
 } PACKED;
 
 struct XSDT;
@@ -33,7 +33,7 @@ struct RSDP {
     XSDT *xsdt;
     uint8_t extendedChecksum;
 
-    bool validate();
+    bool isValid();
 } PACKED;
 
 struct XSDT : public DescriptionHeader {
@@ -96,7 +96,7 @@ struct ICSHeader {
 } PACKED;
 
 struct MADT : public DescriptionHeader {
-    APIC *apicTable;
+    uint32_t apic;
     uint32_t flags;
     ICSHeader ics[0];
 

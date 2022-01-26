@@ -13,4 +13,6 @@ bool memcmp(const void *ptr1, const void *ptr2, size_t size);
 
 size_t strlen(const char *str);
 
+#define STRLEN(str) (sizeof(#str) - 1)
+
 #endif //STRING_C

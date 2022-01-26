@@ -6,9 +6,8 @@
 #include "math.h"
 #include "Attributes.h"
 #include "VirtualMemoryManager.h"
-#include "AllocatorTraits.h"
+#include "traits/AllocatorTraits.h"
 #include "Allocator.h"
-#include "terminal.h"
 
 enum QueryType {
     LESS = 1,

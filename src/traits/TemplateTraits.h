@@ -1,5 +1,5 @@
-#ifndef TEMPLATE_TRAITS_H
-#define TEMPLATE_TRAITS_H
+#ifndef TEMPLATETRAITS_H
+#define TEMPLATETRAITS_H
 
 template<typename, typename>
 struct ReplaceFirstArgument {
@@ -13,4 +13,4 @@ struct ReplaceFirstArgument<Outer<Replacement, Args...>, Replacer> {
 template<typename ...>
 using void_t = void;
 
-#endif //TEMPLATE_TRAITS_H
+#endif //TEMPLATETRAITS_H

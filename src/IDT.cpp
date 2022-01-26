@@ -1,6 +1,5 @@
 #include "IDT.h"
 #include "Attributes.h"
-#include "terminal.h"
 
 #define IDT_DESCRIPTORS_COUNT 36
 

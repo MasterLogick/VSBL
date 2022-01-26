@@ -1,5 +1,5 @@
 #include "PhysicalMemoryManager.h"
-#include "terminal.h"
+#include "iostream.h"
 
 
 const PhysicalMemoryBlock pmm_predefined_unusable_blocks[] = {
@@ -99,14 +99,13 @@ void PhysicalMemoryManager::extractConventionalBlocks() {
             unusableBlocksCount++;
         }
     }
-    terminal_printf("PMM: potential conventional blocks count: %d\n", potentialBlockCount);
-    terminal_printf("PMM: unusable blocks count: %d\n", unusableBlocksCount +
-                                                        sizeof(pmm_predefined_unusable_blocks) /
-                                                        sizeof(pmm_predefined_unusable_blocks[0]));
+    cout << "PMM: potential conventional blocks count: " << potentialBlockCount << "\n";
+    cout << "PMM: unusable blocks count: "
+         << unusableBlocksCount + sizeof(pmm_predefined_unusable_blocks) / sizeof(pmm_predefined_unusable_blocks[0])
+         << "\n";
     conventionalBlocksCount = 0;
     for (int i = 0; i < potentialBlockCount; ++i) {
         addConventionalBlock(potentialMemory[i]);
     }
-    terminal_printf("PMM: memory map ready\n");
-    terminal_printf("PMM: total conventional blocks count: %d\n", conventionalBlocksCount);
+    cout << "PMM: memory map ready\nPMM: total conventional blocks count: " << conventionalBlocksCount << "\n";
 }

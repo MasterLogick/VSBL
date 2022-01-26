@@ -1,7 +1,7 @@
 #include "ps2.h"
 #include "IO.h"
 #include "ACPI/ACPI.h"
-#include "terminal.h"
+#include "iostream.h"
 #include "util.h"
 #include "IDT.h"
 
@@ -22,7 +22,7 @@ void ps2_exec_command(uint8_t command) {
 
 bool ps2_init() {
     if (!(GlobalFADT->IAPC_BOOT_ARCH & 0x2)) {
-        terminal_printf("PS/2: this PC doesn't have PS/2 controller\n");
+        cout << "PS/2: this PC doesn't have PS/2 controller\n";
         return false;
     }
     _idt_disable_hardware_interrupts_asm();
@@ -32,17 +32,17 @@ bool ps2_init() {
         ps2_read_response();
     }
     if (!ps2_test_controller()) {
-        terminal_printf("PS/2: controller test failed\n");
+        cout << "PS/2: controller test failed\n";
         return false;
     }
     if (!ps2_test_first_port()) {
-        terminal_printf("PS/2: first port test failed\n");
+        cout << "PS/2: first port test failed\n";
         return false;
     }
     ps2_enable_first_port();
     ps2_write_configuration_byte(0b01100101);
     _idt_enable_hardware_interrupts_asm();
-    terminal_printf("PS/2: PS/2 is initialised\n");
+    cout << "PS/2: PS/2 is initialised\n";
     return true;
 }
 
@@ -96,12 +96,12 @@ void ps2_write_to_second_device(uint8_t data) {
     ps2_exec_command(data);
 }
 
-bool ps2_reset_first_device(void) {
+bool ps2_reset_first_device() {
     ps2_write_to_first_device(0xFF);
     return ps2_read_response() == 0xFF;
 }
 
-bool ps2_reset_second_device(void) {
+bool ps2_reset_second_device() {
     ps2_write_to_second_device(0xFF);
     return ps2_read_response() == 0xFF;
 }

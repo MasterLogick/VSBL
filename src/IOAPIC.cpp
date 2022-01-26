@@ -1,5 +1,5 @@
 #include "IOAPIC.h"
-#include "terminal.h"
+#include "iostream.h"
 
 #define VERSION_REGISTER 0x1
 #define IO_APIC_RED_TBL_LOW(x) (0x10 + 2 * (x))
@@ -20,7 +20,7 @@ void IOAPIC::writeRegister(uint8_t index, uint32_t value) {
 void IOAPIC::redirectIRQ(uint8_t irq, APIC *apic, uint8_t vector) {
     writeRegister(IO_APIC_RED_TBL_HIGH(irq), (apic->getID() & 0xf) << 24);
     writeRegister(IO_APIC_RED_TBL_LOW(irq), vector);
-    terminal_printf("IO APIC: redirect IRQ%d to APIC %d vector %d\n", irq, apic->getID() & 0xf, vector);
+    cout << "IO APIC: redirect IRQ" << irq << " to APIC " << (apic->getID() & 0xf) << " vector " << vector << "\n";
 }
 
 uint8_t IOAPIC::getRedirectionEntryCount() {

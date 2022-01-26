@@ -8,7 +8,6 @@
 #include "VirtualMemoryBlock.h"
 #include "AVLTree.h"
 #include "Vector.h"
-#include "terminal.h"
 
 #define VMM_PAGE_SIZE 1024
 

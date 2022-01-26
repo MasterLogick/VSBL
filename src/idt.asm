@@ -25,11 +25,16 @@ section .text
    pop rax
 %endmacro
 
-extern _Z15terminal_printfPKcz
+extern cout
+extern _ZN12basic_streamlsEPKc
+extern _ZN12basic_streamlsENS_4FullE
+extern _ZN12basic_streamlsENS_4ModeE
+extern _ZN12basic_streamlsENS_8DefaultsE
+extern _ZN12basic_streamlsEm
+
 extern _ZN4APIC3eoiEv
 extern _ZN4APIC7getAPICEv
 extern _Z26KeyboardGlobalEventHandlerv
-extern _Z20terminal_print_int64mib
 
 ; void _idt_load_table_asm(uint16_t size, void *idt_ptr)
 global _idt_load_table_asm
@@ -47,8 +52,9 @@ size _idt_load_table_asm _idt_load_table_asm.end - _idt_load_table_asm
 global _idt_int_3_handler_asm
 _idt_int_3_handler_asm:
     macro_pushad
-    mov rdi, aInt3Msg
-    call _Z15terminal_printfPKcz
+    mov rdi, cout
+    mov rsi, aInt3Msg
+    call _ZN12basic_streamlsEPKc
     macro_popad
     iretq
 .end:
@@ -58,14 +64,22 @@ size _idt_int_3_handler_asm _idt_int_3_handler_asm.end - _idt_int_3_handler_asm
 global _idt_int_fallback_handler_asm
 _idt_int_fallback_handler_asm:
 ;    macro_pushad
-    mov rdi, aIntFallbackMsg1
-    call _Z15terminal_printfPKcz
-    mov rdi, [rsp + 8]
-    mov rsi, 16
-    mov rdx, 1
-    call _Z20terminal_print_int64mib
-    mov rdi, aIntFallbackMsg2
-    call _Z15terminal_printfPKcz
+    mov rdi, cout
+    mov rsi, aIntFallbackMsg1
+    call _ZN12basic_streamlsEPKc
+    mov rdi, rax
+    call _ZN12basic_streamlsENS_4FullE
+    mov rdi, rax
+    mov esi, 0x10
+    call _ZN12basic_streamlsENS_4ModeE
+    mov rdi, rax
+    mov rsi, [rsp + 8]
+    call _ZN12basic_streamlsEm
+    mov rdi, rax
+    call _ZN12basic_streamlsENS_8DefaultsE
+    mov rsi, aIntFallbackMsg2
+    mov rdi, rax
+    call _ZN12basic_streamlsEPKc
     jmp $
 ;    macro_popad
 ;    iretq
@@ -92,8 +106,9 @@ size _idt_disable_hardware_interrupts_asm _idt_disable_hardware_interrupts_asm.e
 global _idt_int_test_handler_asm
 _idt_int_test_handler_asm:
     macro_pushad
-    mov rdi, aIntTestMsg
-    call _Z15terminal_printfPKcz
+    mov rsi, aIntTestMsg
+    mov rdi, cout
+    call _ZN12basic_streamlsEPKc
     macro_popad
     iretq
 .end:
@@ -103,12 +118,9 @@ size _idt_int_test_handler_asm _idt_int_test_handler_asm.end - _idt_int_test_han
 global _idt_int_DF_handler_asm
 _idt_int_DF_handler_asm:
     macro_pushad
-;    push rax
-;    push rbx
-;    push rcx
-    mov rdi, aIntDFMsg
-    call _Z15terminal_printfPKcz
-;    add rsp, 8*3
+    mov rsi, aIntDFMsg
+    mov rdi, cout
+    call _ZN12basic_streamlsEPKc
     macro_popad
     iretq
 .end:
@@ -118,8 +130,9 @@ size _idt_int_DF_handler_asm _idt_int_DF_handler_asm.end - _idt_int_DF_handler_a
 global _idt_int_apic_timer_handler_asm
 _idt_int_apic_timer_handler_asm:
     macro_pushad
-    mov rdi, aIntTimerMsg
-    call _Z15terminal_printfPKcz
+    mov rdi, cout
+    mov rsi, aIntTimerMsg
+    call _ZN12basic_streamlsEPKc
     call _ZN4APIC7getAPICEv
     mov rdi, rax
     call _ZN4APIC3eoiEv
@@ -135,9 +148,12 @@ _idt_int_apic_error_handler_asm:
     call _ZN4APIC7getAPICEv
     push rax
     add rax, 0x280
+    mov rsi, aIntAPICErrorMsg
+    mov rdi, cout
+    call _ZN12basic_streamlsEPKc
+    mov rsi, rax
     mov rsi, qword [rax]
-    mov rdi, aIntAPICErrorMsg
-    call _Z15terminal_printfPKcz
+    call _ZN12basic_streamlsEm
     pop rdi
     call _ZN4APIC3eoiEv
     macro_popad
@@ -163,26 +179,34 @@ global _idt_int_page_fault_asm
 _idt_int_page_fault_asm:
     macro_pushad
     mov rbx, cr2
-    mov rdi, aIntPageFault1
-    call _Z15terminal_printfPKcz
-    mov rdi, rbx
-    mov rsi, 16
-    mov rdx, 1
-    call _Z20terminal_print_int64mib
-    mov rdi, aIntPageFault2
-    call _Z15terminal_printfPKcz
-    mov rdi, [rsp + 8 * 10]
-    mov rsi, 16
-    mov rdx, 1
-    call _Z20terminal_print_int64mib
-    mov rdi, aIntPageFault3
-    call _Z15terminal_printfPKcz
-    mov rdi, [rsp + 8 * 9]
-    mov rsi, 16
-    mov rdx, 1
-    call _Z20terminal_print_int64mib
-    mov rdi, aIntPageFault4
-    call _Z15terminal_printfPKcz
+    mov rdi, cout
+    mov rsi, aIntPageFault1
+    call _ZN12basic_streamlsEPKc
+    mov rdi, rax
+    call _ZN12basic_streamlsENS_4FullE
+    mov rdi, rax
+    mov esi, 0x10
+    call _ZN12basic_streamlsENS_4ModeE
+    mov rdi, rax
+    mov rsi, rbx
+    call _ZN12basic_streamlsEm
+    mov rdi, rax
+    mov rsi, aIntPageFault2
+    call _ZN12basic_streamlsEPKc
+    mov rdi, rax
+    mov rsi, [rsp + 8 * 10]
+    call _ZN12basic_streamlsEm
+    mov rdi, rax
+    mov rsi, aIntPageFault3
+    call _ZN12basic_streamlsEPKc
+    mov rdi, rax
+    mov rsi, [rsp + 8 * 9]
+    call _ZN12basic_streamlsEm
+    mov rdi, rax
+    mov rsi, aIntPageFault4
+    call _ZN12basic_streamlsEPKc
+    mov rdi, rax
+    call _ZN12basic_streamlsENS_8DefaultsE
     jmp $
     macro_popad
     iretq
@@ -193,8 +217,9 @@ size _idt_int_page_fault_asm _idt_int_page_fault_asm.end - _idt_int_page_fault_a
 global _idt_int_invalid_opcode_asm
 _idt_int_invalid_opcode_asm:
     macro_pushad
-    mov rdi, aIntInvalidOpcode
-    call _Z15terminal_printfPKcz
+    mov rsi, aIntInvalidOpcode
+    mov rdi, cout
+    call _ZN12basic_streamlsEPKc
     macro_popad
     iretq
 
