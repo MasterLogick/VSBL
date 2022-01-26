@@ -4,10 +4,11 @@
 #include "../iostream.h"
 
 PageManager GlobalPageManager;
+uint8_t pageStruct[
+        sizeof(PML4Entry[512]) + sizeof(PDPTEntryDirectory[512]) + sizeof(PDEntryPage[512]) * 4] ALIGNED(4096);
 
 PageManager::PageManager() {
-    uint64_t *tables = reinterpret_cast<uint64_t *>( GlobalVMM->pageAllocateAligned(
-            sizeof(PML4Entry[512]) + sizeof(PDPTEntryDirectory[512]) + sizeof(PDEntryPage[512]) * 4, 4096));
+    uint64_t *tables = reinterpret_cast<uint64_t *>(pageStruct);
     memset(tables, 0, sizeof(PML4Entry[512]) + sizeof(PDPTEntryDirectory[512]) + sizeof(PDEntryPage[512]) * 4);
     PML4Table = new(tables)PML4Entry();
     tables += 512;
