@@ -6,9 +6,7 @@
 #include "../traits/NumberTraits.h"
 #include "../string.h"
 #include "../traits/TemplateTraits.h"
-
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
+#include "Terminal.h"
 
 class basic_stream {
 public:
@@ -31,20 +29,11 @@ public:
     } defaults;
 
 private:
-    int width;
-    int height;
-    int x;
-    int y;
+
     VGAColor terminalColor;
     Mode mode;
     bool modSmall;
     bool modFull;
-
-    void putChar(uint8_t c);
-
-    void insertEntry(VGAEntry entry, int x, int y);
-
-    void shiftUp();
 
     template<typename T>
     void printNumber(T num) {
@@ -69,7 +58,7 @@ private:
         if (NumberTraits<T>::sign) {
             size--;
             if (num < 0) {
-                putChar('-');
+                terminal->putChar(VGAEntry{'-', terminalColor});
             }
         }
         char str[size];
@@ -86,19 +75,15 @@ private:
             }
         }
         for (i += 1; i < size; ++i) {
-            putChar(str[i]);
+            terminal->putChar(VGAEntry{static_cast<uint8_t>(str[i]), terminalColor});
         }
     }
 
 public:
-    constexpr basic_stream() : basic_stream(VGA_WIDTH, VGA_HEIGHT, BLACK, LIGHT_GREY) {}
+    constexpr basic_stream() : basic_stream(BLACK, LIGHT_GREY) {}
 
-    constexpr basic_stream(int width, int height, Color background, Color foreground) : width(width), height(height),
-                                                                                        x(0), y(0),
-                                                                                        terminalColor{foreground,
-                                                                                                      background},
-                                                                                        mode(DECIMAL), modSmall(true),
-                                                                                        modFull(false) {}
+    constexpr basic_stream(Color background, Color foreground) : terminalColor{foreground, background},
+                                                                 mode(DECIMAL), modSmall(true), modFull(false) {}
 
     basic_stream &operator<<(bool c);
 

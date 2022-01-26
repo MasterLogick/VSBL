@@ -18,7 +18,7 @@ struct Allocator {
     }
 
     inline void deallocate(T *ptr) {
-
+        delete ptr;
     }
 };
 

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include "algorithm.h"
 #include "math.h"
+#include "Allocator.h"
+#include "traits/AllocatorTraits.h"
 
 template<typename V, typename Alloc = Allocator<>>
 class Vector {
@@ -24,7 +26,7 @@ class Vector {
 public:
     Vector() : Vector(1) {};
 
-    explicit Vector(size_t size) : size(0), capacity(size) {
+    explicit Vector(int size) : size(0), capacity(size) {
         array = new(allocator.allocate(capacity))V[capacity];
     }
 

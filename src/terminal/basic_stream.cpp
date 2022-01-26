@@ -2,37 +2,6 @@
 
 basic_stream cout;
 
-VGAEntry *const terminal = reinterpret_cast<VGAEntry *>(0xB8000);
-
-void basic_stream::putChar(uint8_t c) {
-    if (c == '\n') {
-        x = 0;
-        y++;
-    } else {
-        insertEntry(VGAEntry{c, terminalColor}, x, y);
-        x++;
-    }
-    if (x == width) {
-        x = 0;
-        y++;
-    }
-    if (y == height) {
-        shiftUp();
-        y--;
-    }
-}
-
-void basic_stream::insertEntry(VGAEntry entry, int x, int y) {
-    terminal[x + y * width] = entry;
-}
-
-void basic_stream::shiftUp() {
-    for (int i = 0; i < width * (height - 1); ++i) {
-        terminal[i] = terminal[i + width];
-    }
-    memset(terminal + (width) * (height - 1), 0, sizeof(VGAEntry) * width);
-}
-
 basic_stream &basic_stream::operator<<(bool c) {
     if (c) {
         operator<<("true");
@@ -43,7 +12,7 @@ basic_stream &basic_stream::operator<<(bool c) {
 }
 
 basic_stream &basic_stream::operator<<(char c) {
-    putChar(c);
+    terminal->putChar(VGAEntry{static_cast<uint8_t>(c), terminalColor});
     return *this;
 }
 
@@ -89,7 +58,7 @@ basic_stream &basic_stream::operator<<(char *c) {
 
 basic_stream &basic_stream::operator<<(const char *c) {
     while (*c) {
-        putChar(*c);
+        terminal->putChar(VGAEntry{static_cast<uint8_t>(*c), terminalColor});
         c++;
     }
     return *this;

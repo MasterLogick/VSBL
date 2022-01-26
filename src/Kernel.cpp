@@ -9,13 +9,17 @@
 #include "Attributes.h"
 #include "VirtualMemoryManager.h"
 #include "ACPI/sdt/RSDP.h"
+#include "terminal/Terminal.h"
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {
-        cout << key;
+        if (key != 0) {
+            cout << key;
+        }
     }
     (void) scancode;
     (void) event;
+    (void) key;
 }
 
 uint8_t vmm[sizeof(VirtualMemoryManager)];
@@ -25,6 +29,7 @@ NORETURN void kmain() {
     GlobalPMM.extractConventionalBlocks();
     GlobalVMM = reinterpret_cast<VirtualMemoryManager *>(vmm);
     GlobalVMM = new(vmm)VirtualMemoryManager();
+    terminal = new Terminal();
     CallGlobalConstructors();
     APIC *apic = APIC::getAPIC();
     apic->enableSpuriousInterrupts();
@@ -62,7 +67,8 @@ NORETURN void kmain() {
     }
     GlobalIOAPIC->redirectIRQ(1, apic, 35);
     cout << "IO APIC: redirection entry count: " << GlobalIOAPIC->getRedirectionEntryCount() << "\n";
-    KeyboardSetLocalEventHandler(local_k_handler);
+    KeyboardAddLocalEventHandler(local_k_handler);
+    KeyboardAddLocalEventHandler(terminalHandler);
     cout << "APIC: RSDP version " << GlobalRSDP->revision << "\n";
 //    terminal_printf("CPUID: max extended value: %x\n", _get_cpuid_leaf_asm(80000008, 0, CPUID_EAX) & 0xff);
     while (true);
