@@ -304,7 +304,7 @@ public:
                         replacer->parent = replacer;
                         rootNode = replacer;
                     }
-                    if (p->key != key) {
+                    if (p->key != removedNode->key) {
                         postRotationUpdate(replacer, p);
                     } else {
                         update(replacer);

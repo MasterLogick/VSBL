@@ -27,7 +27,7 @@ public:
     Vector() : Vector(1) {};
 
     explicit Vector(int size) : size(0), capacity(size) {
-        array = new(allocator.allocate(capacity))V[capacity];
+        array = reinterpret_cast<V *>(allocator.allocate(capacity));
     }
 
     inline int getSize() {
@@ -60,12 +60,20 @@ public:
 
     void resize(int n) {
         if (capacity < n) {
-            V *tmpArray = new(allocator.allocate(n))V[n];
+            V *tmpArray = reinterpret_cast<V *>(allocator.allocate(n));
             copy(tmpArray, array, capacity);
             allocator.deallocate(array);
             array = tmpArray;
             capacity = n;
         }
+    }
+
+    inline V *begin() {
+        return array;
+    }
+
+    inline V *end() {
+        return array + size;
     }
 
 };

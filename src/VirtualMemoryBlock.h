@@ -5,14 +5,9 @@
 #include "MemoryBlock.h"
 
 struct VirtualMemoryBlock : public MemoryBlock {
-    uint16_t flags;
+    explicit VirtualMemoryBlock(MemoryBlock block) : MemoryBlock(block) {}
 
-    explicit VirtualMemoryBlock(MemoryBlock block) : MemoryBlock(block), flags(0) {}
-
-    constexpr VirtualMemoryBlock(base_t base, length_t length) : MemoryBlock({base, length}), flags(0) {}
-
-    constexpr VirtualMemoryBlock(base_t base, length_t length, uint16_t flags) : MemoryBlock({base, length}),
-                                                                                 flags(flags) {}
+    constexpr VirtualMemoryBlock(base_t base, length_t length) : MemoryBlock({base, length}) {}
 
     VirtualMemoryBlock() = default;
 
@@ -21,7 +16,7 @@ struct VirtualMemoryBlock : public MemoryBlock {
     }
 
     void split(VirtualMemoryBlock &block, VirtualMemoryBlock *high) {
-        *high = VirtualMemoryBlock(block.end() + 1, length - block.length - (block.base - base), flags);
+        *high = VirtualMemoryBlock(block.end() + 1, length - block.length - (block.base - base));
         length = block.base - base;
     }
 } PACKED;

@@ -110,12 +110,10 @@ void *VirtualMemoryManager::pageAllocateAligned(size_t n, size_t align) {
         if (alignedBase - sizeof(UsedMemoryTree::Node) != pageDescriptor.base) {
             VirtualMemoryBlock block = VirtualMemoryBlock(pageDescriptor.base,
                                                           alignedBase - sizeof(UsedMemoryTree::Node) -
-                                                          pageDescriptor.base,
-                                                          pageDescriptor.flags);
+                                                          pageDescriptor.base);
             insertFreeBlock(block);
             pageDescriptor = VirtualMemoryBlock(alignedBase - sizeof(UsedMemoryTree::Node),
-                                                pageDescriptor.end() - alignedBase + sizeof(UsedMemoryTree::Node) + 1,
-                                                pageDescriptor.flags);
+                                                pageDescriptor.end() - alignedBase + sizeof(UsedMemoryTree::Node) + 1);
         }
         pageDescriptor.length -= n + sizeof(UsedMemoryTree::Node);
         UsedMemoryTree::Node *descriptor = new(reinterpret_cast<void *>(pageDescriptor.base))UsedMemoryTree::Node(

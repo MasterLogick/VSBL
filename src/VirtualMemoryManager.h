@@ -37,6 +37,9 @@ class VirtualMemoryManager {
             return reinterpret_cast<T *>(GlobalVMM->pageAllocateAligned(sizeof(T) * n));
         }
 
+        /**
+         * Private virtual memory manager page allocator doesn't deallocate pages to prevent recursive calls
+         * */
         void deallocate(T *ptr) {
             (void) ptr;
         }
