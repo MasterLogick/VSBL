@@ -1,13 +1,9 @@
-#include <stdint.h>
-
 typedef void (*GlobalInitializer)();
 
-extern "C" {
-GlobalInitializer GlobalInitArray[INT16_MAX];
-}
+extern GlobalInitializer GlobalInitArray;
 
 void CallGlobalConstructors() {
-    for (int i = 0; GlobalInitArray[i]; ++i) {
-        GlobalInitArray[i]();
+    for (int i = 0; (&GlobalInitArray)[i]; ++i) {
+        (&GlobalInitArray)[i]();
     }
 }
