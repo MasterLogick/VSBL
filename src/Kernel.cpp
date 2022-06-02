@@ -1,7 +1,7 @@
 #include "iostream.h"
-#include "APIC.h"
+#include "APIC/APIC.h"
 #include "IDT.h"
-#include "IOAPIC.h"
+#include "APIC/IOAPIC.h"
 #include "Keyboard.h"
 #include "ps2.h"
 #include "PhysicalMemoryManager.h"
@@ -10,6 +10,8 @@
 #include "VirtualMemoryManager.h"
 #include "ACPI/sdt/RSDP.h"
 #include "terminal/Terminal.h"
+#include "PCI/PCI.h"
+#include "util.h"
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {
@@ -35,7 +37,6 @@ NORETURN void kmain() {
     apic->enableSpuriousInterrupts();
     apic->initLVT();
     apic->setTimerDivider(DIV_128);
-//    apic_alarm_timer(apic_base, 0xffffff);
     uint32_t apic_version = apic->version();
     cout << "APIC: " << (isAPICEnabled() ? "enabled" : "disabled") << "\n"
          << "APIC: This processor is " << (isAPICBSP() ? "BSP" : "AP") << "\n"
@@ -70,6 +71,8 @@ NORETURN void kmain() {
     KeyboardAddLocalEventHandler(local_k_handler);
     KeyboardAddLocalEventHandler(terminalHandler);
     cout << "APIC: RSDP version " << GlobalRSDP->revision << "\n";
+    GlobalPCI = new PCI();
+    GlobalPCI->enumerateFunctions();
 //    terminal_printf("CPUID: max extended value: %x\n", _get_cpuid_leaf_asm(80000008, 0, CPUID_EAX) & 0xff);
-    while (true);
+    _hlt_loop();
 }
