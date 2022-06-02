@@ -8,7 +8,7 @@ set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_ASM_COMPILER yasm)
 set(CMAKE_ASM_FLAGS "-f elf64")
 set(CMAKE_LINKER ld)
-set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker.ld -nostdlib -O2 -m elf_x86_64")
+set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker.ld -nostdlib -O2 -m elf_x86_64 -M")
 set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> ${CMAKE_ASM_FLAGS} -o <OBJECT> <SOURCE>")
 set(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_LINKER> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> <DEFINES> <INCLUDES> ${CMAKE_CXX_FLAGS} -o <OBJECT> -c <SOURCE>")
@@ -26,9 +26,9 @@ add_custom_command(TARGET VSBL POST_BUILD
 set(VBox_Machine_Name Test_VM)
 set(VBox_Machine_Vdi ${CMAKE_SOURCE_DIR}/${VBox_Machine_Name}/${VBox_Machine_Name}.vdi)
 add_custom_target(VSBL_VBox_Update
-        COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 1 --medium none
+        COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --medium none
         COMMAND vboxmanage closemedium ${VBox_Machine_Vdi} --delete
         COMMAND vboxmanage convertfromraw $<TARGET_FILE:VSBL>.bin ${VBox_Machine_Vdi} --format VDI
-        COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 1 --type hdd --medium ${VBox_Machine_Vdi}
+        COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --type hdd --medium ${VBox_Machine_Vdi}
         DEPENDS VSBL
         VERBATIM)
