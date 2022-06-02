@@ -131,4 +131,6 @@ public:
 
 extern basic_stream cout;
 
+const char endl = '\n';
+
 #endif //BASIC_STREAM_C
