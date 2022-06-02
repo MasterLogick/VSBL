@@ -16,3 +16,11 @@ _get_time_asm:
     ret
 .end:
 size _get_time_asm _get_time_asm.end - _get_time_asm
+
+; void _hlt_loop()
+global _hlt_loop
+_hlt_loop:
+    hlt
+    jmp _hlt_loop
+.end:
+size _hlt_loop _hlt_loop.end - _hlt_loop
