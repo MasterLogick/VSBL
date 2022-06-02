@@ -1,5 +1,5 @@
 #include "IOAPIC.h"
-#include "iostream.h"
+#include "../iostream.h"
 
 #define VERSION_REGISTER 0x1
 #define IO_APIC_RED_TBL_LOW(x) (0x10 + 2 * (x))

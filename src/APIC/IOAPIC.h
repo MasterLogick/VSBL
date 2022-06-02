@@ -5,8 +5,8 @@
 #include "APIC.h"
 
 class IOAPIC {
-    Register base;
-    Register data;
+    APICRegister base;
+    APICRegister data;
 
     uint32_t readRegister(uint8_t index);
 
