@@ -33,3 +33,8 @@ add_custom_target(${CMAKE_PROJECT_NAME}_VBox_Update
         COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --type hdd --medium ${VBox_Machine_Vdi}
         DEPENDS ${CMAKE_PROJECT_NAME}
         VERBATIM)
+add_custom_target(${CMAKE_PROJECT_NAME}_VBox_Medium_Create
+        COMMAND vboxmanage convertfromraw $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.bin ${VBox_Machine_Vdi} --format VDI
+        COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --type hdd --medium ${VBox_Machine_Vdi}
+        DEPENDS ${CMAKE_PROJECT_NAME}
+        VERBATIM)

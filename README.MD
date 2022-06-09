@@ -17,17 +17,23 @@ Protected mode and Long mode) [here](https://github.com/MasterLogick/VSBL/tree/m
 + ACPI basic system tables parsing
 + PS/2 keyboard handling
 + Terminal printing like cout in C++
++ PCI management
++ AHCI setup
++ CMake build system
 
 # Build
 
 ## Requirements
 
-`make`, `yasm`, `g++`, `ld` and `objcopy`
+`cmake`, `yasm`, `g++`, `ld` and `objcopy`
 
 ## Compilation
 
 ```bash
-make
+mkdir cmake-build-release
+cd cmake-build-release
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . --target VSBL
 ```
 
 There are two versions of compiled kernel image: `./out/boot.img` (Version for VirtualBox. Aligned to 1MB size)
@@ -45,6 +51,14 @@ You can test your kernel in VirtualBox virtual machine.
 
 ### To start VM:
 
+#### First run
+
 ```bash
-make run_vm
+cmake --build . --target VSBL_VBox_Medium_Create
+```
+
+#### Further runs
+
+```bash
+cmake --build . --target VSBL_VBox_Update
 ```
