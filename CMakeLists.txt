@@ -16,19 +16,20 @@ set(CMAKE_CXX_COMPILE_OBJECT "<CMAKE_CXX_COMPILER> <DEFINES> <INCLUDES> ${CMAKE_
 file(GLOB_RECURSE SRC "src/**")
 
 set(CMAKE_EXECUTABLE_SUFFIX .elf)
-add_executable(VSBL ${SRC})
+add_executable(${CMAKE_PROJECT_NAME} ${SRC})
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC src)
 
 set(KERNEL_PADDING 512)
-add_custom_command(TARGET VSBL POST_BUILD
-        COMMAND sh ${CMAKE_SOURCE_DIR}/extract_image.sh $<TARGET_FILE:VSBL> $<TARGET_FILE:VSBL>.bin ${KERNEL_PADDING}
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND sh ${CMAKE_SOURCE_DIR}/extract_image.sh $<TARGET_FILE:${CMAKE_PROJECT_NAME}> $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.bin ${KERNEL_PADDING}
         VERBATIM)
 
 set(VBox_Machine_Name Test_VM)
 set(VBox_Machine_Vdi ${CMAKE_SOURCE_DIR}/${VBox_Machine_Name}/${VBox_Machine_Name}.vdi)
-add_custom_target(VSBL_VBox_Update
+add_custom_target(${CMAKE_PROJECT_NAME}_VBox_Update
         COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --medium none
         COMMAND vboxmanage closemedium ${VBox_Machine_Vdi} --delete
-        COMMAND vboxmanage convertfromraw $<TARGET_FILE:VSBL>.bin ${VBox_Machine_Vdi} --format VDI
+        COMMAND vboxmanage convertfromraw $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.bin ${VBox_Machine_Vdi} --format VDI
         COMMAND vboxmanage storageattach ${VBox_Machine_Name} --storagectl SATA --port 0 --type hdd --medium ${VBox_Machine_Vdi}
-        DEPENDS VSBL
+        DEPENDS ${CMAKE_PROJECT_NAME}
         VERBATIM)
