@@ -1,7 +1,6 @@
 #include "Keyboard.h"
-#include <stdbool.h>
-#include "ps2.h"
-#include "Vector.h"
+#include <ps2.h>
+#include <Vector.h>
 
 #define KEY_COUNT 0x100
 

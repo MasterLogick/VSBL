@@ -1,7 +1,7 @@
 #ifndef PORTCONTROLREGISTER_H
 #define PORTCONTROLREGISTER_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "CommandList.h"
 #include "ReceivedFrameInformation.h"
 

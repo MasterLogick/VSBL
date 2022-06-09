@@ -1,7 +1,7 @@
 #ifndef GENERICHOSTCONTROL_H
 #define GENERICHOSTCONTROL_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 struct GenericHostControl {
     uint32_t hostCaps;

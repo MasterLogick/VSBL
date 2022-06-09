@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "../Attributes.h"
+#include <Attributes.h>
 #include "APICRegister.h"
 
 enum TimerDivider {

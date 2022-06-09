@@ -1,9 +1,9 @@
 #ifndef HBAPORTCONTROLLER_H
 #define HBAPORTCONTROLLER_H
 
+#include <Vector.h>
 #include "PortControlRegister.h"
 #include "Command.h"
-#include "../Vector.h"
 #include "CommandHolder.h"
 
 class HBAPortController {

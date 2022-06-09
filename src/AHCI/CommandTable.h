@@ -1,7 +1,7 @@
 #ifndef COMMANDTABLE_H
 #define COMMANDTABLE_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "PhysicalRegionDescriptor.h"
 
 struct CommandTable {

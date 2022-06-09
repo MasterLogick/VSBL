@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 #include "VGAEntry.h"
-#include "../traits/NumberTraits.h"
-#include "../string.h"
-#include "../traits/TemplateTraits.h"
+#include <traits/NumberTraits.h>
+#include <string.h>
+#include <traits/TemplateTraits.h>
 #include "Terminal.h"
 
 class basic_stream {

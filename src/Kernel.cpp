@@ -1,17 +1,16 @@
-#include "iostream.h"
-#include "APIC/APIC.h"
-#include "IDT.h"
-#include "APIC/IOAPIC.h"
-#include "Keyboard.h"
-#include "ps2.h"
-#include "PhysicalMemoryManager.h"
-#include "GlobalConstructorCaller.h"
-#include "Attributes.h"
-#include "VirtualMemoryManager.h"
-#include "ACPI/sdt/RSDP.h"
-#include "terminal/Terminal.h"
-#include "PCI/PCI.h"
-#include "util.h"
+#include <iostream.h>
+#include <APIC/APIC.h>
+#include <IDT.h>
+#include <APIC/IOAPIC.h>
+#include <Keyboard.h>
+#include <ps2.h>
+#include <PhysicalMemoryManager.h>
+#include <GlobalConstructorCaller.h>
+#include <Attributes.h>
+#include <VirtualMemoryManager.h>
+#include <ACPI/sdt/RSDP.h>
+#include <PCI/PCI.h>
+#include <util.h>
 
 void local_k_handler(uint8_t scancode, char key, uint32_t event) {
     if (event == KEYBOARD_KEY_PRESSED || event == KEYBOARD_KEY_REPEAT) {

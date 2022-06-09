@@ -1,7 +1,7 @@
 #ifndef PAGESTRUCTUREENTRY_H
 #define PAGESTRUCTUREENTRY_H
 
-#include "../Attributes.h"
+#include <Attributes.h>
 #include <stdint.h>
 
 #define PageStrcutureEntry(name, body...) \

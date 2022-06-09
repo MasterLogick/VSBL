@@ -1,11 +1,11 @@
 #ifndef CPUID_C
 #define CPUID_C
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern uint32_t _get_cpuid_leaf_asm(uint32_t leaf, uint32_t param, uint32_t register_id);
 

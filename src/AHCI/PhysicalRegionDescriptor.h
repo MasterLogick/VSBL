@@ -1,7 +1,7 @@
 #ifndef PHYSICALREGIONDESCRIPTOR_H
 #define PHYSICALREGIONDESCRIPTOR_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 struct PhysicalRegionDescriptor {
     void *dataBase;

@@ -1,7 +1,7 @@
 #ifndef VGAENTRY_H
 #define VGAENTRY_H
 
-#include "../Attributes.h"
+#include <Attributes.h>
 #include <stdint.h>
 #include "VGAColor.h"
 

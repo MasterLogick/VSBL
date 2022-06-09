@@ -1,13 +1,20 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include "Attributes.h"
+#include <Attributes.h>
 
+#ifdef __cplusplus
 extern "C" {
-void _int3_asm();
+#endif
 
-uint32_t _get_time_asm();
+extern void _int3_asm();
 
-NORETURN void _hlt_loop();
-};
+extern uint32_t _get_time_asm();
+
+NORETURN extern void _hlt_loop();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif //UTIL_H

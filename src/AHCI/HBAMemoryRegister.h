@@ -1,8 +1,8 @@
 #ifndef HBAMEMORYREGISTER_H
 #define HBAMEMORYREGISTER_H
 
-#include "stdint.h"
-#include "../Attributes.h"
+#include <stdint.h>
+#include <Attributes.h>
 #include "GenericHostControl.h"
 #include "PortControlRegister.h"
 

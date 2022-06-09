@@ -1,7 +1,7 @@
 #ifndef COMMANDHEADER_H
 #define COMMANDHEADER_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "CommandTable.h"
 
 struct CommandHeader {

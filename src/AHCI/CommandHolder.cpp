@@ -1,7 +1,5 @@
 #include "CommandHolder.h"
-#include "../VirtualMemoryManager.h"
-#include "../string.h"
-#include "../terminal/basic_stream.h"
+#include <iostream.h>
 
 CommandHolder::CommandHolder(PortControlRegister *port, int index) : port(port), index(index) {
     header = port->commandListBaseAddress->headers + index;

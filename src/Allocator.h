@@ -1,8 +1,6 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-#include <stddef.h>
-
 template<typename T = void>
 struct Allocator {
     typedef T ValueType;

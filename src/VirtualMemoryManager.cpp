@@ -2,10 +2,8 @@
 #include "iostream.h"
 #include "Attributes.h"
 
-extern "C" {
 extern char Kernel_Start;
 extern char Kernel_End;
-}
 
 VirtualMemoryManager *GlobalVMM;
 

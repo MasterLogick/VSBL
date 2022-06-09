@@ -1,9 +1,9 @@
 #ifndef AHCIDRIVER_H
 #define AHCIDRIVER_H
 
-#include "../PCI/PCIDeviceConfigSpace.h"
+#include <PCI/PCIDeviceConfigSpace.h>
 #include "HBAMemoryRegister.h"
-#include "../Vector.h"
+#include <Vector.h>
 
 class AHCIDriver {
 private:

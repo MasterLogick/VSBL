@@ -1,13 +1,12 @@
 #ifndef VIRTUALMEMORYMANAGER_H
 #define VIRTUALMEMORYMANAGER_H
 
-#include <stddef.h>
 #include <stdint.h>
-#include "Attributes.h"
+#include <Attributes.h>
+#include <AVLTree.h>
+#include <Vector.h>
 #include "PhysicalMemoryManager.h"
 #include "VirtualMemoryBlock.h"
-#include "AVLTree.h"
-#include "Vector.h"
 
 #define VMM_PAGE_SIZE 1024
 

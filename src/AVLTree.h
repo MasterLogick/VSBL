@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "math.h"
-#include "Attributes.h"
-#include "VirtualMemoryManager.h"
-#include "traits/AllocatorTraits.h"
-#include "Allocator.h"
+#include <math.h>
+#include <Attributes.h>
+#include <VirtualMemoryManager.h>
+#include <traits/AllocatorTraits.h>
+#include <Allocator.h>
 
 enum QueryType {
     LESS = 1,

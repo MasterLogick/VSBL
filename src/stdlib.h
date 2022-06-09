@@ -1,8 +1,6 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
-#include <stddef.h>
-
 template<typename T>
 void swap(T *a, T *b) {
     T tmp = *a;

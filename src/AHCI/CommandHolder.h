@@ -1,7 +1,6 @@
 #ifndef COMMANDHOLDER_H
 #define COMMANDHOLDER_H
 
-
 #include "PortControlRegister.h"
 #include "Command.h"
 

@@ -1,7 +1,7 @@
 #ifndef APICREGISTER_H
 #define APICREGISTER_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 class APICRegister {
     volatile uint32_t val;

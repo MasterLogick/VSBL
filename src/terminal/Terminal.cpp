@@ -1,7 +1,7 @@
 #include "Terminal.h"
-#include "../string.h"
-#include "../Keyboard.h"
-#include "../iostream.h"
+#include <string.h>
+#include <Keyboard.h>
+#include <iostream.h>
 
 Terminal *terminal;
 

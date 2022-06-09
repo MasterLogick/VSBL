@@ -1,11 +1,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <stddef.h>
-#include "algorithm.h"
-#include "math.h"
-#include "Allocator.h"
-#include "traits/AllocatorTraits.h"
+#include <algorithm.h>
+#include <math.h>
+#include <Allocator.h>
+#include <traits/AllocatorTraits.h>
 
 template<typename V, typename Alloc = Allocator<>>
 class Vector {

@@ -2,7 +2,7 @@
 #define VGACOLOR_H
 
 #include <stdint.h>
-#include "../Attributes.h"
+#include <Attributes.h>
 
 enum Color {
     BLACK = 0,

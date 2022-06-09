@@ -1,6 +1,6 @@
 #include "PCIDeviceConfigSpace.h"
+#include <iostream.h>
 #include "PCIConfigSpaceRegister.h"
-#include "../terminal/basic_stream.h"
 
 PCIConfigSpaceRegister<uint16_t> PCIDeviceConfigSpace::getVendorID() {
     return {this, 0};

@@ -1,5 +1,5 @@
 #include "IDT.h"
-#include "Attributes.h"
+#include <Attributes.h>
 
 #define IDT_DESCRIPTORS_COUNT 36
 
@@ -17,7 +17,7 @@ void (*handlers[IDT_DESCRIPTORS_COUNT])(void) = {
         _idt_int_3_handler_asm,               // |    3   |   #BP    | Breakpoint                                 | Trap       | No         | INT3 instruction.
         nullptr,                              // |    4   |   #OF    | Overflow                                   | Trap       | No         | INTO instruction.
         nullptr,                              // |    5   |   #BR    | BOUND Range Exceeded                       | Fault      | No         | BOUND instruction.
-        _idt_int_invalid_opcode_asm,                              // |    6   |   #UD    | Invalid Opcode (Undefined Opcode)          | Fault      | No         | UD instruction or reserved opcode.
+        _idt_int_invalid_opcode_asm,          // |    6   |   #UD    | Invalid Opcode (Undefined Opcode)          | Fault      | No         | UD instruction or reserved opcode.
         nullptr,                              // |    7   |   #NM    | Device Not Available (No Math Coprocessor) | Fault      | No         | Floating-point or WAIT/FWAIT instruction.
         _idt_int_DF_handler_asm,              // |    8   |   #DF    | Double Fault                               | Abort      | Yes (zero) | Any instruction that can generate an exception, an NMI, or an INTR.
         nullptr,                              // |    9   |   —      | Coprocessor Segment Overrun (reserved)     | Fault      | No         | Floating-point instruction.
@@ -32,7 +32,7 @@ void (*handlers[IDT_DESCRIPTORS_COUNT])(void) = {
         nullptr,                              // |   18   |   #MC    | Machine Check                              | Abort      | No         | Error codes (if any) and source are model dependent.
         nullptr,                              // |   19   |   #XM    | SIMD Floating-Point Exception              | Fault      | No         | SSE/SSE2/SSE3 floating-point instructions.
         nullptr,                              // |   20   |   #VE    | Virtualization Exception                   | Fault      | No         | EPT violations.
-        nullptr,                               // |   21   |   #CP    | Control Protection Exception               | Fault      | Yes        | RET, IRET, RSTORSSP, and SETSSBSY instructions can generate this exception. When CET indirect branch tracking is enabled, this exception can be generated due to a missing ENDBRANCH instruction at target of an indirect call or jump.
+        nullptr,                              // |   21   |   #CP    | Control Protection Exception               | Fault      | Yes        | RET, IRET, RSTORSSP, and SETSSBSY instructions can generate this exception. When CET indirect branch tracking is enabled, this exception can be generated due to a missing ENDBRANCH instruction at target of an indirect call or jump.
         //---------Reserved interrupts--------// |  22-31 |   —      | Intel reserved. Do not use                 | —          | —          | —
         nullptr,                              // |   22   |          |                                            |            |            |
         nullptr,                              // |   23   |          |                                            |            |            |

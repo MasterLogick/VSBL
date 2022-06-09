@@ -1,7 +1,7 @@
 #ifndef PCICONFIGSPACEREGISTER_H
 #define PCICONFIGSPACEREGISTER_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "PCI.h"
 #include "PCIDeviceConfigSpace.h"
 

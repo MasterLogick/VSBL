@@ -2,8 +2,8 @@
 #define TERMINAL_H
 
 #include <stdint.h>
+#include <Vector.h>
 #include "VGAEntry.h"
-#include "../Vector.h"
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25

@@ -1,10 +1,9 @@
 #include "HBAPortController.h"
-#include "../terminal/basic_stream.h"
-#include "../terminal/basic_stream.h"
+#include <util.h>
+#include <iostream.h>
+#include <VirtualMemoryManager.h>
 #include "Command.h"
-#include "../VirtualMemoryManager.h"
 #include "SerialATA/RegisterH2DFIS.h"
-#include "../util.h"
 
 CommandHolder *HBAPortController::getFreeCommand() {
     for (CommandHolder *&item: commandHolders) {

@@ -2,8 +2,6 @@
 #define STRING_C
 
 #include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
 
 void memcpy(void *src, void *dst, size_t size);
 

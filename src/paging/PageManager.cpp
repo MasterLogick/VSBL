@@ -1,7 +1,5 @@
 #include "PageManager.h"
-#include "../Attributes.h"
-#include "../VirtualMemoryManager.h"
-#include "../iostream.h"
+#include <iostream.h>
 
 PageManager GlobalPageManager;
 uint8_t pageStruct[

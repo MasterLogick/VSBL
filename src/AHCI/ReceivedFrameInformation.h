@@ -1,7 +1,7 @@
 #ifndef RECEIVEDFRAMEINFORMATION_H
 #define RECEIVEDFRAMEINFORMATION_H
 
-#include "stdint.h"
+#include <stdint.h>
 #include "SerialATA/RegisterD2HFIS.h"
 
 struct ReceivedFrameInformation {

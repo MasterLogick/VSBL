@@ -2,7 +2,6 @@
 #define PS2_H
 
 #include <stdint.h>
-#include <stdbool.h>
 
 bool ps2_init();
 

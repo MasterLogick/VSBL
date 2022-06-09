@@ -1,9 +1,9 @@
 #include "AHCIDriver.h"
-#include "../PCI/PCIConfigSpaceRegister.h"
-#include "../terminal/basic_stream.h"
+#include <iostream.h>
+#include <PCI/PCIConfigSpaceRegister.h>
+#include <VirtualMemoryManager.h>
 #include "HBAPortController.h"
 #include "SerialATA/RegisterH2DFIS.h"
-#include "../VirtualMemoryManager.h"
 
 AHCIDriver::AHCIDriver(PCIDeviceConfigSpace device) : deviceConfigSpace(device) {
     cout << "AHCI:AHCI HBA detected at " << deviceConfigSpace.bus << ":" << deviceConfigSpace.device << ":"
